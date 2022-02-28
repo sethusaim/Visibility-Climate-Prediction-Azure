@@ -17,11 +17,13 @@ class Prediction:
     def __init__(self):
         self.config = read_params()
 
+        self.db_name = self.config["db_log"]["pred"]
+
         self.pred_log = self.config["pred_db_log"]["pred_main"]
 
         self.model_container = self.config["container"]["climate_model_container"]
 
-        self.input_files_container = self.config["container"]["inputs_files_container"]
+        self.input_files = self.config["container"]["inputs_files_container"]
 
         self.prod_model_dir = self.config["models_dir"]["prod"]
 
@@ -37,10 +39,10 @@ class Prediction:
 
         self.class_name = self.__class__.__name__
 
-    def delete_pred_file(self, table_name):
+    def delete_pred_file(self):
         """
         Method Name :   delete_pred_file
-        Description :   This method is used for deleting the existing Prediction batch file
+        Description :   This method is used for deleting the existing prediction batch file
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -51,48 +53,59 @@ class Prediction:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=table_name,
+            db_name=self.db_name,
+            collection_name=self.pred_log,
         )
 
         try:
-            self.blob.load_object(
-                container_name=self.input_files_container, obj=self.pred_output_file
-            )
-
-            self.log_writer.log(
-                table_name=table_name,
-                log_message=f"Found existing Prediction batch file. Deleting it.",
-            )
-
-            self.blob.delete_file(
-                container_name=self.input_files_container,
+            f = self.blob.load_file(
+                container_name=self.input_files,
                 file=self.pred_output_file,
-                table_name=table_name,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
             )
+
+            if f is True:
+                self.log_writer.log(
+                    db_name=self.db_name,
+                    collection_name=self.pred_log,
+                    log_info="Found existing prediction batch file. Deleting it.",
+                )
+
+                self.blob.delete_file(
+                    container_name=self.input_files,
+                    file=self.pred_output_file,
+                    db_name=self.db_name,
+                    collection_name=self.pred_log,
+                )
+
+            else:
+                self.log_writer.log(
+                    db_name=self.db_name,
+                    collection_name=self.pred_log,
+                    log_info="Previous prediction file is not found, not deleting it",
+                )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=table_name,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
+            )
+        except Exception as e:
+            self.log_writer.exception_log(
+                error=e,
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
             )
 
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "404":
-                pass
-
-            else:
-                self.log_writer.exception_log(
-                    error=e,
-                    class_name=self.class_name,
-                    method_name=method_name,
-                    table_name=table_name,
-                )
-
-    def find_correct_model_file(self, cluster_number, container_name, table_name):
+    def find_correct_model_file(self, cluster_number, container_name):
         """
         Method Name :   find_correct_model_file
-        Description :   This method is used for finding the correct model file during Prediction
+        Description :   This method is used for finding the correct model file during prediction
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -103,14 +116,16 @@ class Prediction:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=table_name,
+            db_name=self.db_name,
+            collection_name=self.pred_log,
         )
 
         try:
-            list_of_files = self.blob.get_files(
-                container=container_name,
+            list_of_files = self.blob.get_files_from_folder(
+                db_name=self.db_name,
+                collection_name=self.pred_log,
+                container_name=container_name,
                 folder_name=self.prod_model_dir,
-                table_name=table_name,
             )
 
             for file in list_of_files:
@@ -124,15 +139,17 @@ class Prediction:
             model_name = model_name.split(".")[0]
 
             self.log_writer.log(
-                table_name=table_name,
-                log_message=f"Got {model_name} from {self.prod_model_dir} folder in {container_name} container",
+                db_name=self.db_name,
+                collection_name=self.pred_log,
+                log_info=f"Got {model_name} from {self.prod_model_dir} folder in {container_name} container",
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=table_name,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
             )
 
             return model_name
@@ -142,13 +159,14 @@ class Prediction:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=table_name,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
             )
 
     def predict_from_model(self):
         """
         Method Name :   predict_from_model
-        Description :   This method is used for loading from prod model dir of blob container and use them for Prediction
+        Description :   This method is used for loading from prod model dir of blob container and use them for prediction
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -159,25 +177,30 @@ class Prediction:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.pred_log,
+            db_name=self.db_name,
+            collection_name=self.pred_log,
         )
 
         try:
-            self.delete_pred_file(table_name=self.pred_log)
+            self.delete_pred_file()
 
             data = self.Data_Getter_Pred.get_data()
 
-            is_null_present = self.Preprocessor.is_null_present(data)
+            is_null_present = self.preprocessor.is_null_present(data)
 
             if is_null_present:
-                data = self.Preprocessor.impute_missing_values(data)
+                data = self.preprocessor.impute_missing_values(data)
 
-            cols_to_drop = self.Preprocessor.get_columns_with_zero_std_deviation(data)
+            cols_to_drop = self.preprocessor.get_columns_with_zero_std_deviation(data)
 
-            data = self.Preprocessor.remove_columns(data, cols_to_drop)
+            data = self.preprocessor.remove_columns(data, cols_to_drop)
 
             kmeans = self.blob.load_model(
-                container=self.model_container, model_name="KMeans", table_name=self.pred_log
+                db_name=self.db_name,
+                collection_name=self.pred_log,
+                container_name=self.model_container,
+                model_name="KMeans",
+                model_dir=self.prod_model_dir,
             )
 
             clusters = kmeans.predict(data.drop(["climate"], axis=1))
@@ -198,10 +221,15 @@ class Prediction:
                 crt_model_name = self.find_correct_model_file(
                     cluster_number=i,
                     container_name=self.model_container,
-                    table_name=self.pred_log,
                 )
 
-                model = self.blob.load_model(model_name=crt_model_name)
+                model = self.blob.load_model(
+                    db_name=self.db_name,
+                    collection_name=self.pred_log,
+                    container_name=self.model_container,
+                    model_name=crt_model_name,
+                    model_dir=self.prod_model_dir,
+                )
 
                 result = list(model.predict(cluster_data))
 
@@ -210,19 +238,21 @@ class Prediction:
                 )
 
                 self.blob.upload_df_as_csv(
-                    data_frame=result,
+                    db_name=self.db_name,
+                    collection_name=self.pred_log,
+                    container_file_name=self.input_files,
+                    dataframe=result,
                     file_name=self.pred_output_file,
-                    container=self.input_files_container,
-                    dest_file_name=self.pred_output_file,
-                    table_name=self.pred_log,
                 )
 
             self.log_writer.log(
-                table_name=self.pred_log, log_message=f"End of Prediction"
+                db_name=self.db_name,
+                collection_name=self.pred_log,
+                log_info=f"End of Prediction",
             )
 
             return (
-                self.input_files_container,
+                self.input_files,
                 self.pred_output_file,
                 result.head().to_json(orient="records"),
             )
@@ -232,5 +262,6 @@ class Prediction:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_log,
+                db_name=self.db_name,
+                collection_name=self.pred_log,
             )

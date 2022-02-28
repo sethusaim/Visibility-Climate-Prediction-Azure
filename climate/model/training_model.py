@@ -1,17 +1,16 @@
 import mlflow
+from climate.blob_storage_operations.blob_operations import Blob_Operation
 from climate.data_ingestion.data_loader_train import Data_Getter_Train
 from climate.data_preprocessing.clustering import KMeans_Clustering
 from climate.data_preprocessing.preprocessing import Preprocessor
-from climate.mlflow_utils.mlflow_operations import MLFlow_Operation
-from climate.Model_Finder.tuner import Model_Finder
-
-from climate.blob_storage_operations.blob_operations import Blob_Operation
+from climate.mlflow_utils.mlflow_operations import MLFlow_Operations
+from climate.model_finder.tuner import Model_Finder
 from sklearn.model_selection import train_test_split
 from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class train_model:
+class Train_Model:
     """
     Description :   This method is used for getting the data and applying
                     some preprocessing steps and then train the models and register them in mlflow
@@ -25,7 +24,9 @@ class train_model:
 
         self.config = read_params()
 
-        self.model_train_log = self.config["train_db_log"]["model_training"]
+        self.db_name = self.config["db_log"]["train"]
+
+        self.model_train_log = self.config["train_db_log"]["train_model"]
 
         self.model_container = self.config["container"]["climate_model_container"]
 
@@ -45,7 +46,7 @@ class train_model:
 
         self.class_name = self.__class__.__name__
 
-        self.mlflow_op = MLFlow_Operation(table_name=self.model_train_log)
+        self.mlflow_op = MLFlow_Operations(table_name=self.model_train_log)
 
         self.data_getter_train_obj = Data_Getter_Train(table_name=self.model_train_log)
 
@@ -72,7 +73,8 @@ class train_model:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.model_train_log,
+            db_name=self.db_name,
+            collection_name=self.model_train_log,
         )
 
         try:
@@ -111,8 +113,9 @@ class train_model:
                 cluster_label = cluster_data["Labels"]
 
                 self.log_writer.log(
-                    table_name=self.model_train_log,
-                    log_message="Seprated cluster features and cluster label for the cluster data",
+                    db_name=self.db_name,
+                    collection_name=self.model_train_log,
+                    log_info="Seprated cluster features and cluster label for the cluster data",
                 )
 
                 x_train, x_test, y_train, y_test = train_test_split(
@@ -123,8 +126,9 @@ class train_model:
                 )
 
                 self.log_writer.log(
-                    table_name=self.model_train_log,
-                    log_message=f"Performed train test split with test size as {self.test_size} and random state as {self.random_state}",
+                    db_name=self.db_name,
+                    collection_name=self.model_train_log,
+                    log_info=f"Performed train test split with test size as {self.test_size} and random state as {self.random_state}",
                 )
 
                 (
@@ -137,19 +141,21 @@ class train_model:
                 )
 
                 self.blob.save_model(
-                    idx=i,
+                    db_name=self.db_name,
+                    collection_name=self.model_train_log,
+                    container_name=self.model_container,
                     model=xgb_model,
-                    model_container=self.model_container,
-                    table_name=self.model_train_log,
-                    model_dir="",
+                    idx=i,
+                    model_dir=self.train_model_dir,
                 )
 
                 self.blob.save_model(
                     idx=i,
                     model=rf_model,
                     model_container=self.model_container,
-                    table_name=self.model_train_log,
-                    model_dir="",
+                    db_name=self.db_name,
+                    collection_name=self.model_train_log,
+                    model_dir=self.train_model_dir,
                 )
 
                 try:
@@ -185,33 +191,38 @@ class train_model:
 
                 except Exception as e:
                     self.log_writer.log(
-                        table_name=self.model_train_log,
-                        log_message="Mlflow logging of params,metrics and models failed",
+                        db_name=self.db_name,
+                        collection_name=self.model_train_log,
+                        log_info="Mlflow logging of params,metrics and models failed",
                     )
 
                     self.log_writer.exception_log(
                         error=e,
                         class_name=self.class_name,
                         method_name=method_name,
-                        table_name=self.model_train_log,
+                        db_name=self.db_name,
+                        collection_name=self.model_train_log,
                     )
 
             self.log_writer.log(
-                table_name=self.model_train_log,
-                log_message="Successful End of Training",
+                db_name=self.db_name,
+                collection_name=self.model_train_log,
+                log_info="Successful End of Training",
             )
 
             return number_of_clusters
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.model_train_log,
-                log_message="Unsuccessful End of Training",
+                db_name=self.db_name,
+                collection_name=self.model_train_log,
+                log_info="Unsuccessful End of Training",
             )
 
             self.log_writer.exception_log(
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.model_train_log,
+                db_name=self.db_name,
+                collection_name=self.model_train_log,
             )
