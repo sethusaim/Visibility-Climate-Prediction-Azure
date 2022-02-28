@@ -10,14 +10,16 @@ class Data_Getter_Train:
     Revisions   :   Moved to setup to cloud
     """
 
-    def __init__(self, table_name):
+    def __init__(self, db_name, collection_name):
         self.config = read_params()
 
-        self.table_name = table_name
+        self.db_name = db_name
+
+        self.collection_name = collection_name
 
         self.train_csv_file = self.config["export_csv_file"]["train"]
 
-        self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
+        self.input_files = self.config["container"]["input_files"]
 
         self.blob = Blob_Operation()
 
@@ -32,7 +34,6 @@ class Data_Getter_Train:
         Output      :   A pandas dataframe
         On failure  :   Raise Exception
         Written by  :   iNeuron Intelligence
-
         Version     :   1.2
         Revisions   :   moved setup to cloud
         """
@@ -42,21 +43,24 @@ class Data_Getter_Train:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
             df = self.blob.read_csv(
-                bucket=self.input_files_bucket,
+                container_name=self.input_files,
                 file_name=self.train_csv_file,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return df
@@ -66,5 +70,6 @@ class Data_Getter_Train:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )

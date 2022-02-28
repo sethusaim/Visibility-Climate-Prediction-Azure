@@ -1,23 +1,25 @@
+from climate.blob_storage_operations.blob_operations import Blob_Operation
 from utils.logger import App_Logger
 from utils.read_params import read_params
-from climate.blob_storage_operations.blob_operations import Blob_Operation
 
 
 class Data_Getter_Pred:
     """
-    Description :   This class shall be used for obtaining the df from the source for Prediction
+    Description :   This class shall be used for obtaining the df from the source for prediction
     Version     :   1.2
     Revisions   :   Moved to setup to cloud
     """
 
-    def __init__(self, table_name):
+    def __init__(self, db_name, collection_name):
         self.config = read_params()
 
-        self.table_name = table_name
+        self.db_name = db_name
 
-        self.prediction_file = self.config["export_pred_csv_file"]
+        self.collection_name = collection_name
 
-        self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
+        self.pred_file = self.config["export_csv_file"]["pred"]
+
+        self.input_files = self.config["container"]["input_files"]
 
         self.blob = Blob_Operation()
 
@@ -41,21 +43,24 @@ class Data_Getter_Pred:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
             df = self.blob.read_csv(
-                bucket=self.input_files_bucket,
-                file_name=self.prediction_file,
-                table_name=self.table_name,
+                container_name=self.input_files,
+                file_name=self.pred_file,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return df
@@ -65,5 +70,6 @@ class Data_Getter_Pred:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )

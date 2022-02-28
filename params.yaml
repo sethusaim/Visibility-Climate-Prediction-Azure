@@ -20,11 +20,11 @@ data:
 
 mongodb:
   train:
-    db: climate-train-data
-    collection: climate-train-collection
+    db: wafer-train-data
+    collection: wafer-train-collection
   pred: 
-    db: climate-pred-data
-    collection: climate-pred-collection
+    db: wafer-pred-data
+    collection: wafer-pred-collection
     
 knn_imputer:
   n_neighbors : 3
@@ -40,11 +40,11 @@ kmeans_cluster:
 
 container: 
   input_files: input-files-for-train-and-pred
-  model: climate-model
-  mlflow: climate-mlflow
-  pred_data: climate-pred-data
-  train_data: climate-train-data
-  raw_data: climate-raw-data
+  model: wafer-model
+  mlflow: wafer-mlflow
+  pred_data: wafer-pred-data
+  train_data: wafer-train-data
+  raw_data: wafer-raw-data
 
 models_dir:
   trained : trained/
@@ -93,14 +93,14 @@ model_params:
       - 200
     
 mlflow_config:
-  experiment_name : climate-ops-test
+  experiment_name : wafer-ops-test
   run_name : mlops
   serialization_format : cloudpickle  
   num_of_prod_models : 3
 
 db_log:
-  train : climate_training_logs
-  pred : climate_prediction_logs
+  train : wafer_training_logs
+  pred : wafer_prediction_logs
 
 train_db_log:
   train_model : model_training_log
@@ -134,7 +134,7 @@ elbow_plot_fig : K-Means_Elbow.PNG
 
 null_values_csv_file : null_values.csv
 
-regex_file : climate-regex.txt
+regex_file : wafer-regex.txt
 
 pred_output_file : predictions.csv
 
