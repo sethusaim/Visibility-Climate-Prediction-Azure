@@ -92,11 +92,11 @@ class KMeans_Clustering:
             )
 
             self.blob.upload_file(
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 container_name=self.input_files,
                 src_file=self.elbow_plot_file,
                 dest_file=self.elbow_plot_file,
-                db_name=self.db_name,
-                collection_name=self.collection_name,
             )
 
             self.kn = KneeLocator(
@@ -164,7 +164,6 @@ class KMeans_Clustering:
             self.blob.save_model(
                 container_name=self.model_container,
                 model=self.kmeans,
-                idx=None,
                 model_dir=self.trained_model_dir,
                 db_name=self.db_name,
                 collection_name=self.collection_name,

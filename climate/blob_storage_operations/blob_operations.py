@@ -963,7 +963,7 @@ class Blob_Operation:
             )
 
     def save_model(
-        self, db_name, collection_name, container_name, model, idx, model_dir
+        self, db_name, collection_name, container_name, model, model_dir, idx=None
     ):
         method_name = self.save_model.__name__
 

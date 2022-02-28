@@ -63,7 +63,7 @@ class Preprocessor:
             self.useful_data = self.data.drop(labels=self.columns, axis=1)
 
             self.log_writer.log(
-                table_name=self.table_name, log_message="Column removal Successful"
+                table_name=self.table_name, log_info="Column removal Successful"
             )
 
             self.log_writer.start_log(
@@ -77,7 +77,7 @@ class Preprocessor:
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name, log_message="Column removal Unsuccessful"
+                table_name=self.table_name, log_info="Column removal Unsuccessful"
             )
 
             self.log_writer.exception_log(
@@ -115,7 +115,7 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Label Separation Successful",
+                log_info="Label Separation Successful",
             )
 
             self.log_writer.start_log(
@@ -130,7 +130,7 @@ class Preprocessor:
         except Exception as e:
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Label Separation Unsuccessful",
+                log_info="Label Separation Unsuccessful",
             )
 
             self.log_writer.exception_log(
@@ -163,7 +163,7 @@ class Preprocessor:
             data = data.drop(columnNameList, axis=1)
 
             self.log_writer.log(
-                table_name=self.table_name, log_message="Dropped unnecessary columns"
+                table_name=self.table_name, log_info="Dropped unnecessary columns"
             )
 
             self.log_writer.start_log(
@@ -210,7 +210,7 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Replaced invalid values with np.nan",
+                log_info="Replaced invalid values with np.nan",
             )
 
             self.log_writer.start_log(
@@ -277,7 +277,7 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Created data frame with null values",
+                log_info="Created data frame with null values",
             )
 
             self.blob.upload_df_as_csv(
@@ -299,7 +299,7 @@ class Preprocessor:
         except Exception as e:
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Finding missing values failed",
+                log_info="Finding missing values failed",
             )
 
             self.log_writer.exception_log(
@@ -336,7 +336,7 @@ class Preprocessor:
                 data = pd.get_dummies(data, columns=[column])
 
             self.log_writer.log(
-                table_name=self.table_name, log_message="Encoded target columns"
+                table_name=self.table_name, log_info="Encoded target columns"
             )
 
             self.log_writer.start_log(
@@ -383,7 +383,7 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message=f"Transformed data using {scalar.__class__.__name__}",
+                log_info=f"Transformed data using {scalar.__class__.__name__}",
             )
 
             self.log_writer.start_log(
@@ -434,14 +434,14 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message=f"Initialized {imputer.__class__.__name__}",
+                log_info=f"Initialized {imputer.__class__.__name__}",
             )
 
             self.new_array = imputer.fit_transform(self.data)
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Imputed missing values using KNN imputer",
+                log_info="Imputed missing values using KNN imputer",
             )
 
             self.new_data = pd.DataFrame(
@@ -450,12 +450,12 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Created new dataframe with imputed values",
+                log_info="Created new dataframe with imputed values",
             )
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Imputing missing values Successful",
+                log_info="Imputing missing values Successful",
             )
 
             self.log_writer.start_log(
@@ -508,7 +508,7 @@ class Preprocessor:
 
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Column search for Standard Deviation of Zero Successful",
+                log_info="Column search for Standard Deviation of Zero Successful",
             )
 
             self.log_writer.start_log(
@@ -523,7 +523,7 @@ class Preprocessor:
         except Exception as e:
             self.log_writer.log(
                 table_name=self.table_name,
-                log_message="Column search for Standard Deviation of Zero Failed",
+                log_info="Column search for Standard Deviation of Zero Failed",
             )
 
             self.log_writer.exception_log(
