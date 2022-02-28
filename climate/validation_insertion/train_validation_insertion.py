@@ -14,7 +14,9 @@ class Train_Validation:
     """
 
     def __init__(self, container_name):
-        self.raw_data = Raw_Train_Data_Validation(raw_data_container_name=container_name)
+        self.raw_data = Raw_Train_Data_Validation(
+            raw_data_container_name=container_name
+        )
 
         self.data_transform = Data_Transform_Train()
 

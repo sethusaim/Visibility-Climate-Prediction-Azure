@@ -1,14 +1,13 @@
 import re
 
+from climate.blob_storage_operations.blob_operations import Blob_Operation
 from utils.logger import App_Logger
 from utils.read_params import read_params
-
-from climate.blob_storage_operations.blob_operations import Blob_Operation
 
 
 class Raw_Train_Data_Validation:
     """
-    Description :   This method is used for validating the raw training data
+    Description :   This method is used for validating the raw trainingdata
 
     Version     :   1.2
     Revisions   :   moved to setup to cloud
@@ -16,6 +15,8 @@ class Raw_Train_Data_Validation:
 
     def __init__(self, raw_data_container_name):
         self.config = read_params()
+
+        self.db_name = self.config["db_log"]["train"]
 
         self.raw_data_container_name = raw_data_container_name
 
@@ -25,21 +26,21 @@ class Raw_Train_Data_Validation:
 
         self.blob = Blob_Operation()
 
-        self.train_data_container = self.config["container"]["climate_train_data_container"]
+        self.train_data_container = self.config["container"]["train_data"]
 
-        self.input_files_container = self.config["container"]["input_files_container"]
+        self.input_files = self.config["container"]["input_files"]
 
-        self.raw_train_data_dir = self.config["data"]["raw_data"]["train_batch"]
+        self.raw_train_data_dir = self.config["data"]["raw_data"]["train"]
 
-        self.train_schema_file = self.config["schema_file"]["train_schema_file"]
+        self.train_schema_file = self.config["schema_file"]["train"]
 
         self.regex_file = self.config["regex_file"]
 
         self.train_schema_log = self.config["train_db_log"]["values_from_schema"]
 
-        self.good_train_data_dir = self.config["data"]["train"]["good_data_dir"]
+        self.good_train_data_dir = self.config["data"]["train"]["good"]
 
-        self.bad_train_data_dir = self.config["data"]["train"]["bad_data_dir"]
+        self.bad_train_data_dir = self.config["data"]["train"]["bad"]
 
         self.train_gen_log = self.config["train_db_log"]["general"]
 
@@ -66,13 +67,15 @@ class Raw_Train_Data_Validation:
                 key="start",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_schema_log,
+                db_name=self.db_name,
+                collection_name=self.train_schema_log,
             )
 
             dic = self.blob.read_json(
-                container=self.input_files_container,
-                filename=self.train_schema_file,
-                table_name=self.train_schema_log,
+                db_name=self.db_name,
+                collection_name=self.train_schema_log,
+                container_name=self.input_files,
+                file_name=self.train_schema_file,
             )
 
             LengthOfDateStampInFile = dic["LengthOfDateStampInFile"]
@@ -84,24 +87,26 @@ class Raw_Train_Data_Validation:
             NumberofColumns = dic["NumberofColumns"]
 
             message = (
-                "LengthOfDateStampInFile:: %s" % LengthOfDateStampInFile
+                "LengthOfDateStampInFile: %s" % LengthOfDateStampInFile
                 + "\t"
-                + "LengthOfTimeStampInFile:: %s" % LengthOfTimeStampInFile
+                + "LengthOfTimeStampInFile: %s" % LengthOfTimeStampInFile
                 + "\t "
-                + "NumberofColumns:: %s" % NumberofColumns
+                + "NumberofColumns: %s" % NumberofColumns
                 + "\n"
             )
 
             self.log_writer.log(
-                table_name=self.train_schema_log,
-                log_message=message,
+                db_name=self.db_name,
+                collection_name=self.train_schema_log,
+                log_info=message,
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_schema_log,
+                db_name=self.db_name,
+                collection_name=self.train_schema_log,
             )
 
         except Exception as e:
@@ -109,7 +114,8 @@ class Raw_Train_Data_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_schema_log,
+                db_name=self.db_name,
+                collection_name=self.train_schema_log,
             )
 
         return (
@@ -134,25 +140,29 @@ class Raw_Train_Data_Validation:
                 key="start",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_gen_log,
+                db_name=self.db_name,
+                collection_name=self.train_gen_log,
             )
 
             regex = self.blob.read_text(
                 file_name=self.regex_file,
-                container_name=self.input_files_container,
-                table_name=self.train_gen_log,
+                container_name=self.input_files,
+                db_name=self.db_name,
+                collection_name=self.train_gen_log,
             )
 
             self.log_writer.log(
-                table_name=self.train_gen_log,
-                log_message=f"Got {regex} pattern",
+                db_name=self.db_name,
+                collection_name=self.train_gen_log,
+                log_info=f"Got {regex} pattern",
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_gen_log,
+                db_name=self.db_name,
+                collection_name=self.train_gen_log,
             )
 
             return regex
@@ -162,52 +172,8 @@ class Raw_Train_Data_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_gen_log,
-            )
-
-    def create_dirs_for_good_bad_data(self, table_name):
-        """
-        Method Name :   create_dirs_for_good_bad_data
-        Description :   This method is used for creating directory for good and bad data in blob container
-
-        Version     :   1.2
-        Revisions   :   moved setup to cloud
-        """
-        method_name = self.create_dirs_for_good_bad_data.__name__
-
-        self.log_writer.start_log(
-            key="start",
-            class_name=self.class_name,
-            method_name=method_name,
-            table_name=table_name,
-        )
-
-        try:
-            self.blob.create_folder(
-                container_name=self.train_data_container,
-                folder_name=self.good_train_data_dir,
-                table_name=table_name,
-            )
-
-            self.blob.create_folder(
-                container_name=self.train_data_container,
-                folder_name=self.bad_train_data_dir,
-                table_name=table_name,
-            )
-
-            self.log_writer.start_log(
-                key="exit",
-                class_name=self.class_name,
-                method_name=method_name,
-                table_name=table_name,
-            )
-
-        except Exception as e:
-            self.log_writer.exception_log(
-                error=e,
-                class_name=self.class_name,
-                method_name=method_name,
-                table_name=table_name,
+                db_name=self.db_name,
+                collection_name=self.train_gen_log,
             )
 
     def validate_raw_file_name(
@@ -226,23 +192,24 @@ class Raw_Train_Data_Validation:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.train_name_valid_log,
+            db_name=self.db_name,
+            collection_name=self.train_name_valid_log,
         )
 
         try:
-            self.create_dirs_for_good_bad_data(table_name=self.train_name_valid_log)
-
-            onlyfiles = self.blob.get_files(
-                container=self.raw_data_container_name,
+            onlyfiles = self.blob.get_files_from_folder(
+                db_name=self.db_name,
+                collection_name=self.train_name_valid_log,
+                container_name=self.raw_data_container_name,
                 folder_name=self.raw_train_data_dir,
-                table_name=self.train_name_valid_log,
             )
 
             train_batch_files = [f.split("/")[1] for f in onlyfiles]
 
             self.log_writer.log(
-                table_name=self.train_name_valid_log,
-                log_message="Got training files with exact name",
+                db_name=self.db_name,
+                collection_name=self.train_name_valid_log,
+                log_info="Got training files with exact name",
             )
 
             for filename in train_batch_files:
@@ -253,8 +220,9 @@ class Raw_Train_Data_Validation:
                 bad_data_train_filename = self.bad_train_data_dir + "/" + filename
 
                 self.log_writer.log(
-                    table_name=self.train_name_valid_log,
-                    log_message="Created raw,good and bad data filenames",
+                    db_name=self.db_name,
+                    collection_name=self.train_name_valid_log,
+                    log_info="Created raw,good and bad data filenames",
                 )
 
                 if re.match(regex, filename):
@@ -265,45 +233,50 @@ class Raw_Train_Data_Validation:
                     if len(splitAtDot[1]) == LengthOfDateStampInFile:
                         if len(splitAtDot[2]) == LengthOfTimeStampInFile:
                             self.blob.copy_data(
-                                src_container=self.raw_data_container_name,
+                                db_name=self.db_name,
+                                collection_name=self.train_name_valid_log,
+                                src_container_name=self.raw_data_container_name,
+                                dest_container_name=self.train_data_container,
                                 src_file=raw_data_train_filename,
-                                dest_container=self.train_data_container,
                                 dest_file=good_data_train_filename,
-                                table_name=self.train_name_valid_log,
                             )
 
                         else:
                             self.blob.copy_data(
-                                src_container=self.raw_data_container_name,
+                                db_name=self.db_name,
+                                collection_name=self.train_name_valid_log,
+                                src_container_name=self.raw_data_container_name,
+                                dest_container_name=self.train_data_container,
                                 src_file=raw_data_train_filename,
-                                dest_container=self.train_data_container,
                                 dest_file=bad_data_train_filename,
-                                table_name=self.train_name_valid_log,
                             )
 
                     else:
                         self.blob.copy_data(
-                            src_container=self.raw_data_container_name,
+                            db_name=self.db_name,
+                            collection_name=self.train_name_valid_log,
+                            src_container_name=self.raw_data_container_name,
+                            dest_container_name=self.train_data_container,
                             src_file=raw_data_train_filename,
-                            dest_container=self.train_data_container,
                             dest_file=bad_data_train_filename,
-                            table_name=self.train_name_valid_log,
                         )
 
                 else:
                     self.blob.copy_data(
-                        src_container=self.raw_data_container_name,
+                        db_name=self.db_name,
+                        collection_name=self.train_name_valid_log,
+                        src_container_name=self.raw_data_container_name,
+                        dest_container_name=self.train_data_container,
                         src_file=raw_data_train_filename,
-                        dest_container=self.train_data_container,
                         dest_file=bad_data_train_filename,
-                        table_name=self.train_name_valid_log,
                     )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_name_valid_log,
+                db_name=self.db_name,
+                collection_name=self.train_name_valid_log,
             )
 
         except Exception as e:
@@ -311,7 +284,8 @@ class Raw_Train_Data_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_name_valid_log,
+                db_name=self.db_name,
+                collection_name=self.train_name_valid_log,
             )
 
     def validate_col_length(self, NumberofColumns):
@@ -328,23 +302,24 @@ class Raw_Train_Data_Validation:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.train_col_valid_log,
+            db_name=self.db_name,
+            collection_name=self.train_col_valid_log,
         )
 
         try:
-            lst = self.blob.read_csv(
-                container=self.train_data_container,
-                file_name=self.good_train_data_dir,
-                folder=True,
-                table_name=self.train_col_valid_log,
+            lst = self.blob.read_csv_from_folder(
+                folder_name=self.good_train_data_dir,
+                container_name=self.train_data_container,
+                db_name=self.db_name,
+                collection_name=self.train_col_valid_log,
             )
 
-            for idx, f in enumerate(lst):
-                df = f[idx][0]
+            for f in lst:
+                df = f[0]
 
-                file = f[idx][1]
+                file = f[1]
 
-                abs_f = f[idx][2]
+                abs_f = f[2]
 
                 if file.endswith(".csv"):
                     if df.shape[1] == NumberofColumns:
@@ -354,11 +329,12 @@ class Raw_Train_Data_Validation:
                         dest_f = self.bad_train_data_dir + "/" + abs_f
 
                         self.blob.move_data(
-                            src_container=self.train_data_container,
+                            db_name=self.db_name,
+                            collection_name=self.train_col_valid_log,
+                            src_container_name=self.train_data_container,
+                            dest_container_name=self.train_data_container,
                             src_file=file,
-                            dest_container=self.train_data_container,
                             dest_file=dest_f,
-                            table_name=self.train_col_valid_log,
                         )
 
                 else:
@@ -368,7 +344,8 @@ class Raw_Train_Data_Validation:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_col_valid_log,
+                db_name=self.db_name,
+                collection_name=self.train_col_valid_log,
             )
 
         except Exception as e:
@@ -376,7 +353,8 @@ class Raw_Train_Data_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_col_valid_log,
+                db_name=self.db_name,
+                collection_name=self.train_col_valid_log,
             )
 
     def validate_missing_values_in_col(self):
@@ -393,23 +371,24 @@ class Raw_Train_Data_Validation:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.train_missing_value_log,
+            db_name=self.db_name,
+            collection_name=self.train_missing_value_log,
         )
 
         try:
-            lst = self.blob.read_csv(
-                container=self.train_data_container,
-                file_name=self.good_train_data_dir,
-                folder=True,
-                table_name=self.train_missing_value_log,
+            lst = self.blob.read_csv_from_folder(
+                folder_name=self.good_train_data_dir,
+                container_name=self.train_data_container,
+                db_name=self.db_name,
+                collection_name=self.train_missing_value_log,
             )
 
-            for idx, f in enumerate(lst):
-                df = f[idx][0]
+            for f in lst:
+                df = f[0]
 
-                file = f[idx][1]
+                file = f[1]
 
-                abs_f = f[idx][2]
+                abs_f = f[2]
 
                 if abs_f.endswith(".csv"):
                     count = 0
@@ -421,11 +400,12 @@ class Raw_Train_Data_Validation:
                             dest_f = self.bad_train_data_dir + "/" + abs_f
 
                             self.blob.move_data(
-                                src_container=self.train_data_container,
+                                db_name=self.db_name,
+                                collection_name=self.train_missing_value_log,
+                                src_container_name=self.train_data_container,
+                                dest_container_name=self.train_data_container,
                                 src_file=file,
-                                dest_container=self.train_data_container,
                                 dest_file=dest_f,
-                                table_name=self.train_missing_value_log,
                             )
 
                             break
@@ -434,11 +414,12 @@ class Raw_Train_Data_Validation:
                         dest_f = self.good_train_data_dir + "/" + abs_f
 
                         self.blob.upload_df_as_csv(
-                            data_frame=df,
+                            db_name=self.db_name,
+                            collection_name=self.train_missing_value_log,
+                            container_name=self.train_data_container,
+                            dataframe=df,
                             file_name=abs_f,
-                            container=self.train_data_container,
-                            dest_file_name=dest_f,
-                            table_name=self.train_missing_value_log,
+                            container_file_name=dest_f,
                         )
 
                 else:
@@ -448,7 +429,8 @@ class Raw_Train_Data_Validation:
                     key="exit",
                     class_name=self.class_name,
                     method_name=method_name,
-                    table_name=self.train_missing_value_log,
+                    db_name=self.db_name,
+                    collection_name=self.train_missing_value_log,
                 )
 
         except Exception as e:
@@ -456,5 +438,6 @@ class Raw_Train_Data_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.train_missing_value_log,
+                db_name=self.db_name,
+                collection_name=self.train_missing_value_log,
             )

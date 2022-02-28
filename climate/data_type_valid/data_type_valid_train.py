@@ -18,7 +18,9 @@ class DB_Operation_Train:
 
         self.class_name = self.__class__.__name__
 
-        self.train_data_container = self.config["container"]["climate_train_data_container"]
+        self.train_data_container = self.config["container"][
+            "climate_train_data_container"
+        ]
 
         self.train_export_csv_file = self.config["export_train_csv_file"]
 

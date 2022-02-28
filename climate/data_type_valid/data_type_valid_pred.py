@@ -18,7 +18,9 @@ class DB_Operation_Pred:
 
         self.class_name = self.__class__.__name__
 
-        self.pred_data_container = self.config["container"]["climate_pred_data_container"]
+        self.pred_data_container = self.config["container"][
+            "climate_pred_data_container"
+        ]
 
         self.pred_export_csv_file = self.config["export_csv_file"]["pred"]
 
