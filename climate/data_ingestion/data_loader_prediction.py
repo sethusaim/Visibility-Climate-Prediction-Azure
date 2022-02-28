@@ -19,7 +19,7 @@ class Data_Getter_Pred:
 
         self.pred_file = self.config["export_csv_file"]["pred"]
 
-        self.input_files = self.config["container"]["input_files"]
+        self.input_files_container = self.config["container"]["input_files"]
 
         self.blob = Blob_Operation()
 
@@ -49,10 +49,10 @@ class Data_Getter_Pred:
 
         try:
             df = self.blob.read_csv(
+                file_name=self.pred_file,
+                container_name=self.input_files_container,
                 db_name=self.db_name,
                 collection_name=self.collection_name,
-                container_name=self.input_files,
-                local_file_name=self.pred_file,
             )
 
             self.log_writer.start_log(
