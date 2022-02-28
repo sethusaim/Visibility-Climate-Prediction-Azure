@@ -261,7 +261,7 @@ class Blob_Operation:
         db_name,
         collection_name,
         container_name,
-        local_local_file_name,
+        local_file_name,
         container_file_name,
         remove=True,
         replace=True,
@@ -312,13 +312,13 @@ class Blob_Operation:
                         log_info=f"{container_file_name} file exists is {f}",
                     )
 
-                with open(file=local_local_file_name, mode="rb") as f:
+                with open(file=local_file_name, mode="rb") as f:
                     client.upload_blob(data=f, name=container_file_name)
 
                 self.log_writer.log(
                     db_name=db_name,
                     collection_name=collection_name,
-                    log_info=f"Uploaded {local_local_file_name} to {container_name} container with name as {container_file_name} file",
+                    log_info=f"Uploaded {local_file_name} to {container_name} container with name as {container_file_name} file",
                 )
 
             else:
@@ -329,19 +329,19 @@ class Blob_Operation:
                 )
 
             if remove is True:
-                os.remove(local_local_file_name)
+                os.remove(local_file_name)
 
                 self.log_writer.log(
                     db_name=db_name,
                     collection_name=collection_name,
-                    log_info=f"Remove option is set to {remove}, removed {local_local_file_name} from local",
+                    log_info=f"Remove option is set to {remove}, removed {local_file_name} from local",
                 )
 
             else:
                 self.log_writer.log(
                     db_name=db_name,
                     collection_name=collection_name,
-                    log_info=f"Removed option is set to {remove}, not removing the {local_local_file_name} from local",
+                    log_info=f"Removed option is set to {remove}, not removing the {local_file_name} from local",
                 )
 
         except Exception as e:
@@ -782,8 +782,8 @@ class Blob_Operation:
         collection_name,
         src_container_name,
         dest_container_name,
-        local_local_file_name,
-        container_file_name,
+        from_file,
+        to_file,
     ):
         method_name = self.copy_data.__name__
 
@@ -804,19 +804,19 @@ class Blob_Operation:
 
             src_blob = self.get_blob_url(
                 container_name=src_container_name,
-                local_file_name=local_local_file_name,
+                local_file_name=from_file,
                 db_name=db_name,
                 collection_name=collection_name,
             )
 
-            dest_blob = dest_client.get_blob_client(blob=container_file_name)
+            dest_blob = dest_client.get_blob_client(blob=to_file)
 
             dest_blob.start_copy_from_url(src_blob)
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Copied {local_local_file_name} file from {src_container_name} container to {container_file_name} file from {dest_container_name}",
+                log_info=f"Copied {from_file} file from {src_container_name} container to {to_file} file from {dest_container_name}",
             )
 
             self.log_writer.start_log(
@@ -842,7 +842,7 @@ class Blob_Operation:
         collection_name,
         src_container_name,
         dest_container_name,
-        local_local_file_name,
+        local_file_name,
         container_file_name,
     ):
         method_name = self.move_data.__name__
@@ -859,7 +859,7 @@ class Blob_Operation:
             self.copy_data(
                 src_container_name=src_container_name,
                 dest_container_name=dest_container_name,
-                local_local_file_name=local_local_file_name,
+                local_file_name=local_file_name,
                 container_file_name=container_file_name,
                 db_name=db_name,
                 collection_name=collection_name,
@@ -867,7 +867,7 @@ class Blob_Operation:
 
             self.delete_file(
                 container_name=src_container_name,
-                local_file_name=local_local_file_name,
+                local_file_name=local_file_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -875,7 +875,7 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Moved {local_local_file_name} file from {src_container_name} container to {dest_container_name} container,with {container_file_name} file as name",
+                log_info=f"Moved {local_file_name} file from {src_container_name} container to {dest_container_name} container,with {container_file_name} file as name",
             )
 
             self.log_writer.start_log(
@@ -1021,7 +1021,7 @@ class Blob_Operation:
 
             self.upload_file(
                 container_name=container_name,
-                local_local_file_name=model_file,
+                local_file_name=model_file,
                 container_file_name=container_model_file,
             )
 
@@ -1124,7 +1124,7 @@ class Blob_Operation:
                 db_name=db_name,
                 collection_name=collection_name,
                 container_name=container_name,
-                local_local_file_name=local_file_name,
+                local_file_name=local_file_name,
                 container_file_name=container_file_name,
             )
 

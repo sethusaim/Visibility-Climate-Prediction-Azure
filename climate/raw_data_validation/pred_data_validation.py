@@ -237,7 +237,7 @@ class Raw_Pred_Data_Validation:
                                 collection_name=self.pred_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.pred_data_container,
-                                local_local_file_name=raw_data_pred_filename,
+                                local_file_name=raw_data_pred_filename,
                                 container_file_name=good_data_pred_filename,
                             )
 
@@ -247,7 +247,7 @@ class Raw_Pred_Data_Validation:
                                 collection_name=self.pred_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.pred_data_container,
-                                local_local_file_name=raw_data_pred_filename,
+                                local_file_name=raw_data_pred_filename,
                                 container_file_name=bad_data_pred_filename,
                             )
 
@@ -257,7 +257,7 @@ class Raw_Pred_Data_Validation:
                             collection_name=self.pred_name_valid_log,
                             src_container_name=self.raw_data_container_name,
                             dest_container_name=self.pred_data_container,
-                            local_local_file_name=raw_data_pred_filename,
+                            local_file_name=raw_data_pred_filename,
                             container_file_name=bad_data_pred_filename,
                         )
 
@@ -267,7 +267,7 @@ class Raw_Pred_Data_Validation:
                         collection_name=self.pred_name_valid_log,
                         src_container_name=self.raw_data_container_name,
                         dest_container_name=self.pred_data_container,
-                        local_local_file_name=raw_data_pred_filename,
+                        local_file_name=raw_data_pred_filename,
                         container_file_name=bad_data_pred_filename,
                     )
 
@@ -333,7 +333,7 @@ class Raw_Pred_Data_Validation:
                             collection_name=self.pred_col_valid_log,
                             src_container_name=self.pred_data_container,
                             dest_container_name=self.pred_data_container,
-                            local_local_file_name=file,
+                            local_file_name=file,
                             container_file_name=dest_f,
                         )
 
@@ -404,7 +404,7 @@ class Raw_Pred_Data_Validation:
                                 collection_name=self.pred_missing_value_log,
                                 src_container_name=self.pred_data_container,
                                 dest_container_name=self.pred_data_container,
-                                local_local_file_name=file,
+                                local_file_name=file,
                                 container_file_name=dest_f,
                             )
 

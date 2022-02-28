@@ -130,7 +130,7 @@ class DB_Operation_Train:
                 data_frame=df,
                 file_name=self.train_export_csv_file,
                 container=self.input_files,
-                dest_file_name=self.train_export_csv_file,
+                to_file_name=self.train_export_csv_file,
                 db_name=self.db_name,
                 collection_name=self.train_export_csv_log,
             )
