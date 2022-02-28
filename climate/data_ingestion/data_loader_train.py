@@ -1,9 +1,9 @@
-from climate.s3_bucket_operations.s3_operations import s3_operations
-from utils.logger import app_logger
+from climate.blob_storage_operations.blob_operations import Blob_Operation
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class data_getter_train:
+class Data_Getter_Train:
     """
     Description :   This class shall be used for obtaining the df from the source for training
     Version     :   1.2
@@ -19,9 +19,9 @@ class data_getter_train:
 
         self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
 
-        self.s3 = s3_operations()
+        self.blob = Blob_Operation()
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
         self.class_name = self.__class__.__name__
 
@@ -46,7 +46,7 @@ class data_getter_train:
         )
 
         try:
-            df = self.s3.read_csv(
+            df = self.blob.read_csv(
                 bucket=self.input_files_bucket,
                 file_name=self.train_csv_file,
                 table_name=self.table_name,

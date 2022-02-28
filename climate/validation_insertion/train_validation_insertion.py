@@ -1,11 +1,11 @@
-from climate.data_transform.data_transformation_train import data_transform_train
-from climate.data_type_valid.data_type_valid_train import db_operation_train
-from climate.raw_data_validation.train_data_validation import raw_train_data_validation
-from utils.logger import app_logger
+from climate.data_transform.data_transformation_train import Data_Transform_Train
+from climate.data_type_valid.data_type_valid_train import DB_Operation_Train
+from climate.raw_data_validation.train_data_validation import Raw_Train_Data_Validation
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class train_validation:
+class Train_Validation:
     """
     Description :   This class is used for validating all the training batch files
 
@@ -14,11 +14,11 @@ class train_validation:
     """
 
     def __init__(self, bucket_name):
-        self.raw_data = raw_train_data_validation(raw_data_bucket_name=bucket_name)
+        self.raw_data = Raw_Train_Data_Validation(raw_data_bucket_name=bucket_name)
 
-        self.data_transform = data_transform_train()
+        self.data_transform = Data_Transform_Train()
 
-        self.db_operation = db_operation_train()
+        self.db_operation = DB_Operation_Train()
 
         self.config = read_params()
 
@@ -34,7 +34,7 @@ class train_validation:
             "climate_train_data_collection"
         ]
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
     def training_validation(self):
         """

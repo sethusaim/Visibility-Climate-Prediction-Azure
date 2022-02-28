@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.templating import Jinja2Templates
 
-from climate.model.load_production_model import load_prod_model
-from climate.model.prediction_from_model import prediction
+from climate.model.load_production_model import Load_Prod_Model
+from climate.model.prediction_from_model import Prediction
 from climate.model.training_model import train_model
-from climate.validation_insertion.prediction_validation_insertion import pred_validation
-from climate.validation_insertion.train_validation_insertion import train_validation
-from utils.log_tables import create_log_table
+from climate.validation_insertion.prediction_validation_insertion import Pred_Validation
+from climate.validation_insertion.train_validation_insertion import Train_Validation
+from utils.create_containers import create_log_table
 from utils.read_params import read_params
 
 os.putenv("LANG", "en_US.UTF-8")
@@ -54,7 +54,7 @@ async def trainRouteClient():
 
         time.sleep(5)
 
-        train_val_obj = train_validation(bucket_name=raw_data_train_bucket_name)
+        train_val_obj = Train_Validation(bucket_name=raw_data_train_bucket_name)
 
         train_val_obj.training_validation()
 
@@ -62,7 +62,7 @@ async def trainRouteClient():
 
         num_clusters = train_model_obj.training_model()
 
-        load_prod_model_obj = load_prod_model(num_clusters=num_clusters)
+        load_prod_model_obj = Load_Prod_Model(num_clusters=num_clusters)
 
         load_prod_model_obj.load_production_model()
 
@@ -81,16 +81,16 @@ async def predictRouteClient():
 
         table_obj.generate_log_tables(type="pred")
 
-        pred_val = pred_validation(raw_data_pred_bucket_name)
+        pred_val = Pred_Validation(raw_data_pred_bucket_name)
 
         pred_val.prediction_validation()
 
-        pred = prediction()
+        pred = Prediction()
 
         bucket, filename, json_predictions = pred.predict_from_model()
 
         return Response(
-            f"prediction file created in {bucket} bucket with filename as {filename}, and few of the predictions are {str(json.loads(json_predictions))}"
+            f"Prediction file created in {bucket} bucket with filename as {filename}, and few of the predictions are {str(json.loads(json_predictions))}"
         )
 
     except Exception as e:

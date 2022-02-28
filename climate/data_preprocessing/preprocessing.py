@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
-from climate.s3_bucket_operations.s3_operations import s3_operations
+
+from climate.blob_storage_operations.blob_operations import Blob_Operation
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import StandardScaler
-from utils.logger import app_logger
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class preprocessor:
+class Preprocessor:
     """
     Written By  :   iNeuron Intelligence
     Version     :   1.2
@@ -15,7 +16,7 @@ class preprocessor:
     """
 
     def __init__(self, table_name):
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
         self.config = read_params()
 
@@ -33,7 +34,7 @@ class preprocessor:
 
         self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
 
-        self.s3 = s3_operations()
+        self.blob = Blob_Operation()
 
     def remove_columns(self, data, columns):
         """
@@ -114,7 +115,8 @@ class preprocessor:
             self.Y = data[label_column_name]
 
             self.log_writer.log(
-                table_name=self.table_name, log_message="Label Separation Successful",
+                table_name=self.table_name,
+                log_message="Label Separation Successful",
             )
 
             self.log_writer.start_log(
@@ -128,7 +130,8 @@ class preprocessor:
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name, log_message="Label Separation Unsuccessful",
+                table_name=self.table_name,
+                log_message="Label Separation Unsuccessful",
             )
 
             self.log_writer.exception_log(
@@ -278,7 +281,7 @@ class preprocessor:
                 log_message="Created data frame with null values",
             )
 
-            self.s3.upload_df_as_csv(
+            self.blob.upload_df_as_csv(
                 data_frame=self.dataframe_with_null,
                 file_name=self.null_values_file,
                 bucket=self.input_files_bucket,
@@ -296,7 +299,8 @@ class preprocessor:
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name, log_message="Finding missing values failed",
+                table_name=self.table_name,
+                log_message="Finding missing values failed",
             )
 
             self.log_writer.exception_log(

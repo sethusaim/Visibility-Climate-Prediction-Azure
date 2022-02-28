@@ -1,13 +1,12 @@
 import pandas as pd
-from botocore.exceptions import ClientError
-from climate.data_ingestion.data_loader_prediction import data_getter_pred
-from climate.data_preprocessing.preprocessing import preprocessor
-from climate.s3_bucket_operations.s3_operations import s3_operations
-from utils.logger import app_logger
+from climate.blob_storage_operations.blob_operations import Blob_Operation
+from climate.data_ingestion.data_loader_prediction import Data_Getter_Pred
+from climate.data_preprocessing.preprocessing import Preprocessor
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class prediction:
+class Prediction:
     """
     Description :   This class shall be used for loading the production model
 
@@ -28,20 +27,20 @@ class prediction:
 
         self.pred_output_file = self.config["pred_output_file"]
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
-        self.s3 = s3_operations()
+        self.blob = Blob_Operation()
 
-        self.data_getter_pred = data_getter_pred(table_name=self.pred_log)
+        self.Data_Getter_Pred = Data_Getter_Pred(table_name=self.pred_log)
 
-        self.preprocessor = preprocessor(table_name=self.pred_log)
+        self.Preprocessor = Preprocessor(table_name=self.pred_log)
 
         self.class_name = self.__class__.__name__
 
     def delete_pred_file(self, table_name):
         """
         Method Name :   delete_pred_file
-        Description :   This method is used for deleting the existing prediction batch file
+        Description :   This method is used for deleting the existing Prediction batch file
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -56,16 +55,16 @@ class prediction:
         )
 
         try:
-            self.s3.load_object(
+            self.blob.load_object(
                 bucket_name=self.input_files_bucket, obj=self.pred_output_file
             )
 
             self.log_writer.log(
                 table_name=table_name,
-                log_message=f"Found existing prediction batch file. Deleting it.",
+                log_message=f"Found existing Prediction batch file. Deleting it.",
             )
 
-            self.s3.delete_file(
+            self.blob.delete_file(
                 bucket_name=self.input_files_bucket,
                 file=self.pred_output_file,
                 table_name=table_name,
@@ -93,7 +92,7 @@ class prediction:
     def find_correct_model_file(self, cluster_number, bucket_name, table_name):
         """
         Method Name :   find_correct_model_file
-        Description :   This method is used for finding the correct model file during prediction
+        Description :   This method is used for finding the correct model file during Prediction
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -108,7 +107,7 @@ class prediction:
         )
 
         try:
-            list_of_files = self.s3.get_files(
+            list_of_files = self.blob.get_files(
                 bucket=bucket_name,
                 folder_name=self.prod_model_dir,
                 table_name=table_name,
@@ -149,7 +148,7 @@ class prediction:
     def predict_from_model(self):
         """
         Method Name :   predict_from_model
-        Description :   This method is used for loading from prod model dir of s3 bucket and use them for prediction
+        Description :   This method is used for loading from prod model dir of blob bucket and use them for Prediction
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -166,18 +165,18 @@ class prediction:
         try:
             self.delete_pred_file(table_name=self.pred_log)
 
-            data = self.data_getter_pred.get_data()
+            data = self.Data_Getter_Pred.get_data()
 
-            is_null_present = self.preprocessor.is_null_present(data)
+            is_null_present = self.Preprocessor.is_null_present(data)
 
             if is_null_present:
-                data = self.preprocessor.impute_missing_values(data)
+                data = self.Preprocessor.impute_missing_values(data)
 
-            cols_to_drop = self.preprocessor.get_columns_with_zero_std_deviation(data)
+            cols_to_drop = self.Preprocessor.get_columns_with_zero_std_deviation(data)
 
-            data = self.preprocessor.remove_columns(data, cols_to_drop)
+            data = self.Preprocessor.remove_columns(data, cols_to_drop)
 
-            kmeans = self.s3.load_model(
+            kmeans = self.blob.load_model(
                 bucket=self.model_bucket, model_name="KMeans", table_name=self.pred_log
             )
 
@@ -202,7 +201,7 @@ class prediction:
                     table_name=self.pred_log,
                 )
 
-                model = self.s3.load_model(model_name=crt_model_name)
+                model = self.blob.load_model(model_name=crt_model_name)
 
                 result = list(model.predict(cluster_data))
 
@@ -210,7 +209,7 @@ class prediction:
                     list(zip(climate_names, result)), columns=["climate", "Prediction"]
                 )
 
-                self.s3.upload_df_as_csv(
+                self.blob.upload_df_as_csv(
                     data_frame=result,
                     file_name=self.pred_output_file,
                     bucket=self.input_files_bucket,

@@ -1,10 +1,11 @@
-from climate.mongo_db_operations.mongo_operations import mongo_db_operation
-from climate.s3_bucket_operations.s3_operations import s3_operations
-from utils.logger import app_logger
+from climate.mongo_db_operations.mongo_operations import MongoDB_Operation
+
+from climate.blob_storage_operations.blob_operations import Blob_Operation
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class db_operation_train:
+class DB_Operation_Train:
     """
     Description :    This class shall be used for handling all the db operations
 
@@ -29,11 +30,11 @@ class db_operation_train:
 
         self.train_export_csv_log = self.config["train_db_log"]["export_csv"]
 
-        self.s3 = s3_operations()
+        self.blob = Blob_Operation()
 
-        self.db_op = mongo_db_operation()
+        self.db_op = MongoDB_Operation()
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
     def insert_good_data_as_record(self, good_data_db_name, good_data_collection_name):
         """
@@ -53,7 +54,7 @@ class db_operation_train:
         )
 
         try:
-            lst = self.s3.read_csv(
+            lst = self.blob.read_csv(
                 bucket=self.train_data_bucket,
                 file_name=self.good_data_train_dir,
                 table_name=self.train_db_insert_log,
@@ -120,7 +121,7 @@ class db_operation_train:
                 table_name=self.train_export_csv_log,
             )
 
-            self.s3.upload_df_as_csv(
+            self.blob.upload_df_as_csv(
                 data_frame=df,
                 file_name=self.train_export_csv_file,
                 bucket=self.input_files_bucket,

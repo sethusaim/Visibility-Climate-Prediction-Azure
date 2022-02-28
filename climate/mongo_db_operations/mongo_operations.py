@@ -3,11 +3,11 @@ import os
 
 import pandas as pd
 from pymongo import MongoClient
-from utils.logger import app_logger
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class mongo_db_operation:
+class MongoDB_Operation:
     """
     Description :   This method is used for all mongodb operations
 
@@ -22,7 +22,7 @@ class mongo_db_operation:
 
         self.DB_URL = os.environ["MONGODB_URL"]
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
     def get_client(self, table_name):
         """
@@ -170,7 +170,8 @@ class mongo_db_operation:
             )
 
             self.log_writer.log(
-                table_name=table_name, log_message=f"Got the collection from mongodb",
+                table_name=table_name,
+                log_message=f"Got the collection from mongodb",
             )
 
             self.log_writer.start_log(
@@ -220,7 +221,8 @@ class mongo_db_operation:
                 df = df.drop(columns=["_id"], axis=1)
 
             self.log_writer.log(
-                table_name=table_name, log_message="Converted collection to dataframe",
+                table_name=table_name,
+                log_message="Converted collection to dataframe",
             )
 
             self.log_writer.start_log(

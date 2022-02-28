@@ -1,12 +1,12 @@
-from climate.s3_bucket_operations.s3_operations import s3_operations
+from climate.blob_storage_operations.blob_operations import Blob_Operation
 from kneed import KneeLocator
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
-from utils.logger import app_logger
+from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class kmeans_clustering:
+class KMeans_Clustering:
     """
     Description :   This class shall  be used to divide the data into clusters before training.
     Version     :   1.2
@@ -32,18 +32,18 @@ class kmeans_clustering:
 
         self.kmeans_direction = self.config["kmeans_cluster"]["knee"]["direction"]
 
-        self.s3 = s3_operations()
+        self.blob = Blob_Operation()
 
         self.elbow_plot_file = self.config["elbow_plot_fig"]
 
-        self.log_writer = app_logger()
+        self.log_writer = App_Logger()
 
         self.class_name = self.__class__.__name__
 
     def elbow_plot(self, data):
         """
         Method Name :   elbow_plot
-        Description :   This method saves the plot to s3 bucket and decides the optimum number of clusters to the file.
+        Description :   This method saves the plot to blob bucket and decides the optimum number of clusters to the file.
         Output      :   A picture saved to the s3_bucket
         On Failure  :   Raise Exception
 
@@ -86,7 +86,7 @@ class kmeans_clustering:
                 log_message="Saved elbow_plot fig and local copy is created",
             )
 
-            self.s3.upload_file(
+            self.blob.upload_file(
                 src_file=self.elbow_plot_file,
                 bucket=self.input_files_bucket,
                 dest_file=self.elbow_plot_file,
@@ -151,7 +151,7 @@ class kmeans_clustering:
 
             self.y_kmeans = self.kmeans.fit_predict(data)
 
-            self.s3.save_model(
+            self.blob.save_model(
                 idx=None,
                 model=self.kmeans,
                 model_bucket=self.model_bucket,
