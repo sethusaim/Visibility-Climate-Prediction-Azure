@@ -24,7 +24,7 @@ class Blob_Operation:
 
         self.model_save_format = self.config["model_utils"]["save_format"]
 
-    def get_container_client(self, db_name, collection_name, container_name):
+    def get_container_client(self, container_name, db_name, collection_name):
         method_name = self.get_container_client.__name__
 
         self.log_writer.start_log(
@@ -65,37 +65,19 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def get_blob_service_client(self, db_name, collection_name):
-        method_name = self.get_blob_service_client.__name__
-
-        self.log_writer.start_log(
-            key="start",
-            class_name=self.class_name,
-            method_name=method_name,
-            db_name=db_name,
-            collection_name=collection_name,
-        )
+    def get_blob_client(self, blob_file_name, container_name, db_name, collection_name):
+        method_name = self.get_blob_client.__name__
 
         try:
             client = BlobServiceClient.from_connection_string(
                 conn_str=self.connection_string
             )
 
-            self.log_writer.log(
-                db_name=db_name,
-                collection_name=collection_name,
-                log_info="Got blob service client from connection string",
+            blob_client = client.get_blob_client(
+                container=container_name, blob=blob_file_name
             )
 
-            self.log_writer.start_log(
-                key="exit",
-                class_name=self.class_name,
-                method_name=method_name,
-                db_name=db_name,
-                collection_name=collection_name,
-            )
-
-            return client
+            return blob_client
 
         except Exception as e:
             self.log_writer.exception_log(
@@ -175,9 +157,9 @@ class Blob_Operation:
 
         try:
             client = self.get_container_client(
+                container_name=container_name,
                 db_name=db_name,
                 collection_name=collection_name,
-                container_name=container_name,
             )
 
             client.delete_container()
@@ -205,7 +187,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def load_file(self, container_name, file, db_name, collection_name):
+    def load_file(self, container_name, file_name, db_name, collection_name):
         method_name = self.load_file.__name__
 
         self.log_writer.start_log(
@@ -217,11 +199,12 @@ class Blob_Operation:
         )
 
         try:
-            client = self.get_blob_service_client(
-                db_name=db_name, collection_name=collection_name
+            blob_client = self.get_blob_client(
+                blob_file_name=file_name,
+                container_name=container_name,
+                db_name=db_name,
+                collection_name=collection_name,
             )
-
-            blob_client = client.get_blob_client(container=container_name, blob=file)
 
             self.log_writer.log(
                 db_name=db_name,
@@ -234,7 +217,7 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"{file} file exists is {f}",
+                log_info=f"{file_name} file exists is {f}",
             )
 
             self.log_writer.start_log(
@@ -258,11 +241,11 @@ class Blob_Operation:
 
     def upload_file(
         self,
-        db_name,
-        collection_name,
-        container_name,
         local_file_name,
         container_file_name,
+        container_name,
+        db_name,
+        collection_name,
         remove=True,
         replace=True,
     ):
@@ -299,10 +282,10 @@ class Blob_Operation:
 
                 if f is True:
                     self.delete_file(
+                        file_name=container_file_name,
+                        container_name=container_name,
                         db_name=db_name,
                         collection_name=collection_name,
-                        container_name=container_name,
-                        local_file_name=container_file_name,
                     )
 
                 else:
@@ -353,7 +336,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def delete_file(self, db_name, collection_name, container_name, local_file_name):
+    def delete_file(self, file_name, container_name, db_name, collection_name):
         method_name = self.delete_file.__name__
 
         self.log_writer.start_log(
@@ -371,12 +354,12 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-            client.delete_blob(local_file_name)
+            client.delete_blob(file_name)
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Deleted {local_file_name} file from {container_name} container",
+                log_info=f"Deleted {file_name} file from {container_name} container",
             )
 
             self.log_writer.start_log(
@@ -396,7 +379,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def get_object(self, db_name, collection_name, container_name, local_file_name):
+    def get_object(self, file_name, container_name, db_name, collection_name):
         method_name = self.get_object.__name__
 
         try:
@@ -406,12 +389,12 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-            f = client.download_blob(blob=local_file_name)
+            f = client.download_blob(blob=file_name)
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Got {local_file_name} info from {container_name} container",
+                log_info=f"Got {file_name} info from {container_name} container",
             )
 
             self.log_writer.start_log(
@@ -434,7 +417,7 @@ class Blob_Operation:
             )
 
     def read_object(
-        self, db_name, collection_name, object, decode=True, make_readable=False
+        self, object, db_name, collection_name, decode=True, make_readable=False
     ):
         method_name = self.read_object.__name__
 
@@ -480,7 +463,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def read_text(self, db_name, collection_name, container_name, local_file_name):
+    def read_text(self, file_name, container_name, db_name, collection_name):
         method_name = self.read_text.__name__
 
         self.log_writer.start_log(
@@ -494,7 +477,7 @@ class Blob_Operation:
         try:
             f_obj = self.get_object(
                 container_name=container_name,
-                local_file_name=local_file_name,
+                local_file_name=file_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -522,7 +505,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def read_json(self, db_name, collection_name, container_name, local_file_name):
+    def read_json(self, file_name, container_name, db_name, collection_name):
         method_name = self.read_json.__name__
 
         self.log_writer.start_log(
@@ -536,7 +519,7 @@ class Blob_Operation:
         try:
             f_obj = self.get_object(
                 container_name=container_name,
-                local_file_name=local_file_name,
+                local_file_name=file_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -550,7 +533,7 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Read {local_file_name} json file from {container_name} container",
+                log_info=f"Read {file_name} json file from {container_name} container",
             )
 
             self.log_writer.start_log(
@@ -572,7 +555,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def get_df_from_object(self, db_name, collection_name, object):
+    def get_df_from_object(self, object, db_name, collection_name):
         method_name = self.get_df_from_object.__name__
 
         self.log_writer.start_log(
@@ -619,8 +602,18 @@ class Blob_Operation:
             )
 
     def get_files_from_folder(
-        self, db_name, collection_name, container_name, folder_name
+        self, folder_name, container_name, db_name, collection_name
     ):
+        method_name = self.get_files_from_folder.__name__
+
+        self.log_writer.start_log(
+            key="start",
+            class_name=self.class_name,
+            method_name=method_name,
+            db_name=db_name,
+            collection_name=collection_name,
+        )
+
         try:
             client = self.get_container_client(
                 container_name=container_name,
@@ -634,18 +627,47 @@ class Blob_Operation:
 
             f_name_lst = [f.name for f in blob_list]
 
+            self.log_writer.log(
+                db_name=db_name,
+                collection_name=collection_name,
+                log_info=f"Got files from {folder_name} folder from {container_name} container",
+            )
+
+            self.log_writer.start_log(
+                key="exit",
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=db_name,
+                collection_name=collection_name,
+            )
+
             return f_name_lst
 
         except Exception as e:
-            raise e
+            self.log_writer.exception_log(
+                error=e,
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=db_name,
+                collection_name=collection_name,
+            )
 
     def read_csv_from_folder(
         self, folder_name, container_name, db_name, collection_name
     ):
+        method_name = self.read_csv_from_folder.__name__
+
+        self.log_writer.start_log(
+            key="start",
+            class_name=self.class_name,
+            method_name=method_name,
+            db_name=db_name,
+            collection_name=collection_name,
+        )
         try:
             files = self.get_files_from_folder(
-                container_name=container_name,
                 folder_name=folder_name,
+                container_name=container_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -653,8 +675,8 @@ class Blob_Operation:
             lst = [
                 (
                     self.read_csv(
+                        file_name=f,
                         container_name=container_name,
-                        local_file_name=f,
                         db_name=db_name,
                         collection_name=collection_name,
                     ),
@@ -667,15 +689,29 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info="Got list of tuples consisting of dataframe,file name and abs file name",
+                log_info=f"Read csv files from {folder_name} folder from {container_name} container",
+            )
+
+            self.log_writer.start_log(
+                key="exit",
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=db_name,
+                collection_name=collection_name,
             )
 
             return lst
 
         except Exception as e:
-            raise e
+            self.log_writer.exception_log(
+                error=e,
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=db_name,
+                collection_name=collection_name,
+            )
 
-    def read_csv(self, db_name, collection_name, container_name, local_file_name):
+    def read_csv(self, file_name, container_name, db_name, collection_name):
         method_name = self.read_csv.__name__
 
         self.log_writer.start_log(
@@ -688,8 +724,8 @@ class Blob_Operation:
 
         try:
             csv_obj = self.get_object(
+                file_name=file_name,
                 container_name=container_name,
-                local_file_name=local_file_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -701,7 +737,7 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Read {local_file_name} csv file from {container_name} container",
+                log_info=f"Read {file_name} csv file from {container_name} container",
             )
 
             self.log_writer.start_log(
@@ -723,7 +759,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def get_blob_url(self, db_name, collection_name, container_name, local_file_name):
+    def get_blob_url(self, file_name, container_name, db_name, collection_name):
         method_name = self.get_blob_url.__name__
 
         self.log_writer.start_log(
@@ -735,26 +771,25 @@ class Blob_Operation:
         )
 
         try:
-            client = self.get_blob_service_client(
-                db_name=db_name, collection_name=collection_name
-            )
-
-            blob_file = client.get_blob_client(
-                container=container_name, blob=local_file_name
+            blob_client = self.get_blob_client(
+                blob_file_name=file_name,
+                container_name=container_name,
+                db_name=db_name,
+                collection_name=collection_name,
             )
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Got {local_file_name} blob from {container_name} container",
+                log_info=f"Got {file_name} blob from {container_name} container",
             )
 
-            f = blob_file.url
+            f = blob_client.url
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Got {local_file_name} blob url",
+                log_info=f"Got {file_name} blob url",
             )
 
             self.log_writer.start_log(
@@ -778,12 +813,12 @@ class Blob_Operation:
 
     def copy_data(
         self,
+        from_file_name,
+        from_container_name,
+        to_file_name,
+        to_container_name,
         db_name,
         collection_name,
-        src_container_name,
-        dest_container_name,
-        from_file,
-        to_file,
     ):
         method_name = self.copy_data.__name__
 
@@ -797,26 +832,26 @@ class Blob_Operation:
 
         try:
             dest_client = self.get_container_client(
-                container_name=dest_container_name,
+                container_name=to_container_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
 
-            src_blob = self.get_blob_url(
-                container_name=src_container_name,
-                local_file_name=from_file,
+            from_blob = self.get_blob_url(
+                container_name=from_container_name,
+                local_file_name=from_file_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
 
-            dest_blob = dest_client.get_blob_client(blob=to_file)
+            to_blob = dest_client.get_blob_client(blob=to_file_name)
 
-            dest_blob.start_copy_from_url(src_blob)
+            to_blob.start_copy_from_url(from_blob)
 
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Copied {from_file} file from {src_container_name} container to {to_file} file from {dest_container_name}",
+                log_info=f"Copied {from_file_name} file from {from_container_name} container to {to_file_name} file from {to_container_name}",
             )
 
             self.log_writer.start_log(
@@ -838,12 +873,12 @@ class Blob_Operation:
 
     def move_data(
         self,
+        from_file_name,
+        from_container_name,
+        to_file_name,
+        to_container_name,
         db_name,
         collection_name,
-        src_container_name,
-        dest_container_name,
-        local_file_name,
-        container_file_name,
     ):
         method_name = self.move_data.__name__
 
@@ -857,17 +892,17 @@ class Blob_Operation:
 
         try:
             self.copy_data(
-                src_container_name=src_container_name,
-                dest_container_name=dest_container_name,
-                local_file_name=local_file_name,
-                container_file_name=container_file_name,
+                from_file_name=from_file_name,
+                from_container_name=from_container_name,
+                to_file_name=to_file_name,
+                to_container_name=to_container_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
 
             self.delete_file(
-                container_name=src_container_name,
-                local_file_name=local_file_name,
+                file_name=from_file_name,
+                container_name=from_container_name,
                 db_name=db_name,
                 collection_name=collection_name,
             )
@@ -875,7 +910,7 @@ class Blob_Operation:
             self.log_writer.log(
                 db_name=db_name,
                 collection_name=collection_name,
-                log_info=f"Moved {local_file_name} file from {src_container_name} container to {dest_container_name} container,with {container_file_name} file as name",
+                log_info=f"Moved {from_file_name} file from {from_container_name} container to {to_container_name} container,with {to_file_name} file as name",
             )
 
             self.log_writer.start_log(
@@ -896,7 +931,7 @@ class Blob_Operation:
             )
 
     def load_model(
-        self, db_name, collection_name, container_name, model_name, model_dir=None
+        self, model_name, container_name, db_name, collection_name, model_dir=None
     ):
         method_name = self.load_model.__name__
 
@@ -924,17 +959,17 @@ class Blob_Operation:
             )
 
             f_obj = self.get_object(
+                file_name=model_file,
                 container_name=container_name,
-                local_file_name=model_file,
                 db_name=db_name,
                 collection_name=collection_name,
             )
 
             model_content = self.read_object(
                 object=f_obj,
-                decode=False,
                 db_name=db_name,
                 collection_name=collection_name,
+                decode=False,
             )
 
             model = pickle.loads(model_content)
@@ -965,7 +1000,7 @@ class Blob_Operation:
             )
 
     def save_model(
-        self, db_name, collection_name, container_name, model, model_dir, idx=None
+        self, model, model_dir, container_name, db_name, collection_name, idx=None
     ):
         method_name = self.save_model.__name__
 
@@ -1020,9 +1055,11 @@ class Blob_Operation:
             )
 
             self.upload_file(
-                container_name=container_name,
                 local_file_name=model_file,
-                container_file_name=container_model_file,
+                container_file_name=model_file,
+                container_name=container_name,
+                db_name=db_name,
+                collection_name=collection_name,
             )
 
             self.log_writer.start_log(
@@ -1055,18 +1092,18 @@ class Blob_Operation:
 
         try:
             files = self.get_files_from_folder(
+                folder_name=folder_name,
+                container_name=container_name,
                 db_name=db_name,
                 collection_name=collection_name,
-                container_name=container_name,
-                folder_name=folder_name,
             )
 
             for f in files:
                 self.delete_file(
+                    file_name=f,
+                    container_name=container_name,
                     db_name=db_name,
                     collection_name=collection_name,
-                    container_name=container_name,
-                    local_file_name=f,
                 )
 
             self.log_writer.log(
@@ -1094,12 +1131,12 @@ class Blob_Operation:
 
     def upload_df_as_csv(
         self,
-        db_name,
-        collection_name,
-        container_name,
         dataframe,
         local_file_name,
         container_file_name,
+        container_name,
+        db_name,
+        collection_name,
     ):
         method_name = self.upload_df_as_csv.__name__
 
@@ -1121,11 +1158,11 @@ class Blob_Operation:
             )
 
             self.upload_file(
-                db_name=db_name,
-                collection_name=collection_name,
-                container_name=container_name,
                 local_file_name=local_file_name,
                 container_file_name=container_file_name,
+                container_name=container_name,
+                db_name=db_name,
+                collection_name=collection_name,
             )
 
             self.log_writer.start_log(

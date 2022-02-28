@@ -694,8 +694,8 @@ class MLFlow_Operations:
                 self.blob.copy_data(
                     db_name=self.db_name,
                     collection_name=self.collection_name,
-                    src_container_name=src_container,
-                    dest_container_name=dest_container,
+                    from_container_name=src_container,
+                    to_container_name=dest_container,
                     from_file=trained_model_file,
                     to_file=prod_model_file,
                 )
