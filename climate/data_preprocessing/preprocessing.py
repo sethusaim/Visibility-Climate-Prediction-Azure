@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 from climate.blob_storage_operations.blob_operations import Blob_Operation
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import StandardScaler
@@ -28,11 +27,11 @@ class Preprocessor:
 
         self.n_components = self.config["pca_model"]["n_components"]
 
-        self.knn_n_neighbors = self.config["n_neighbors"]
+        self.knn_n_neighbors = self.config["knn_imputer"]["n_neighbors"]
 
-        self.knn_weights = (self.config["weights"],)
+        self.knn_weights = self.config["knn_imputer"]["weights"]
 
-        self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
+        self.input_files_container = self.config["container"]["input_files"]
 
         self.blob = Blob_Operation()
 
@@ -284,7 +283,7 @@ class Preprocessor:
             self.blob.upload_df_as_csv(
                 data_frame=self.dataframe_with_null,
                 file_name=self.null_values_file,
-                bucket=self.input_files_bucket,
+                container=self.input_files_container,
                 dest_file_name=self.null_values_file,
             )
 

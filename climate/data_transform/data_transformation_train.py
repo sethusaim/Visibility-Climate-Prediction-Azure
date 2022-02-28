@@ -15,7 +15,7 @@ class Data_Transform_Train:
     def __init__(self):
         self.config = read_params()
 
-        self.train_data_bucket = self.config["s3_bucket"]["climate_train_data_bucket"]
+        self.train_data_container = self.config["blob_container"]["climate_train_data_container"]
 
         self.blob = Blob_Operation()
 
@@ -46,7 +46,7 @@ class Data_Transform_Train:
 
         try:
             lst = self.blob.read_csv(
-                bucket=self.train_data_bucket,
+                container=self.train_data_container,
                 file_name=self.good_train_data_dir,
                 folder=True,
                 table_name=self.train_data_transform_log,
@@ -70,7 +70,7 @@ class Data_Transform_Train:
                     self.blob.upload_df_as_csv(
                         data_frame=df,
                         file_name=abs_f,
-                        bucket=self.train_data_bucket,
+                        container=self.train_data_container,
                         dest_file_name=file,
                         table_name=self.train_data_transform_log,
                     )

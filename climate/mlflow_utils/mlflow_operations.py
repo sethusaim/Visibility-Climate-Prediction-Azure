@@ -574,10 +574,10 @@ class MLFlow_Operation:
                 table_name=self.table_name,
             )
 
-    def transition_mlflow_model(self, model_version, stage, model_name, bucket):
+    def transition_mlflow_model(self, model_version, stage, model_name, container):
         """
         Method Name :   transition_mlflow_model
-        Description :   This method transitions the models in mlflow and as well as in blob bucket based on
+        Description :   This method transitions the models in mlflow and as well as in blob container based on
                         the best model for the particular cluster
 
         Version     :   1.2
@@ -633,9 +633,9 @@ class MLFlow_Operation:
                 )
 
                 self.blob.copy_data(
-                    src_bucket=bucket,
+                    src_container=container,
                     src_file=trained_model_file,
-                    dest_bucket=bucket,
+                    dest_container=container,
                     dest_file=prod_model_file,
                     table_name=self.table_name,
                 )
@@ -656,9 +656,9 @@ class MLFlow_Operation:
                 )
 
                 self.blob.copy_data(
-                    src_bucket=bucket,
+                    src_container=container,
                     src_file=trained_model_file,
-                    dest_bucket=bucket,
+                    dest_container=container,
                     dest_file=stag_model_file,
                     table_name=self.table_name,
                 )

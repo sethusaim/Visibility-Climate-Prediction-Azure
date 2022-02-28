@@ -19,9 +19,9 @@ class Prediction:
 
         self.pred_log = self.config["pred_db_log"]["pred_main"]
 
-        self.model_bucket = self.config["s3_bucket"]["climate_model_bucket"]
+        self.model_container = self.config["blob_container"]["climate_model_container"]
 
-        self.input_files_bucket = self.config["s3_bucket"]["inputs_files_bucket"]
+        self.input_files_container = self.config["blob_container"]["inputs_files_container"]
 
         self.prod_model_dir = self.config["models_dir"]["prod"]
 
@@ -56,7 +56,7 @@ class Prediction:
 
         try:
             self.blob.load_object(
-                bucket_name=self.input_files_bucket, obj=self.pred_output_file
+                container_name=self.input_files_container, obj=self.pred_output_file
             )
 
             self.log_writer.log(
@@ -65,7 +65,7 @@ class Prediction:
             )
 
             self.blob.delete_file(
-                bucket_name=self.input_files_bucket,
+                container_name=self.input_files_container,
                 file=self.pred_output_file,
                 table_name=table_name,
             )
@@ -89,7 +89,7 @@ class Prediction:
                     table_name=table_name,
                 )
 
-    def find_correct_model_file(self, cluster_number, bucket_name, table_name):
+    def find_correct_model_file(self, cluster_number, container_name, table_name):
         """
         Method Name :   find_correct_model_file
         Description :   This method is used for finding the correct model file during Prediction
@@ -108,7 +108,7 @@ class Prediction:
 
         try:
             list_of_files = self.blob.get_files(
-                bucket=bucket_name,
+                container=container_name,
                 folder_name=self.prod_model_dir,
                 table_name=table_name,
             )
@@ -125,7 +125,7 @@ class Prediction:
 
             self.log_writer.log(
                 table_name=table_name,
-                log_message=f"Got {model_name} from {self.prod_model_dir} folder in {bucket_name} bucket",
+                log_message=f"Got {model_name} from {self.prod_model_dir} folder in {container_name} container",
             )
 
             self.log_writer.start_log(
@@ -148,7 +148,7 @@ class Prediction:
     def predict_from_model(self):
         """
         Method Name :   predict_from_model
-        Description :   This method is used for loading from prod model dir of blob bucket and use them for Prediction
+        Description :   This method is used for loading from prod model dir of blob container and use them for Prediction
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -177,7 +177,7 @@ class Prediction:
             data = self.Preprocessor.remove_columns(data, cols_to_drop)
 
             kmeans = self.blob.load_model(
-                bucket=self.model_bucket, model_name="KMeans", table_name=self.pred_log
+                container=self.model_container, model_name="KMeans", table_name=self.pred_log
             )
 
             clusters = kmeans.predict(data.drop(["climate"], axis=1))
@@ -197,7 +197,7 @@ class Prediction:
 
                 crt_model_name = self.find_correct_model_file(
                     cluster_number=i,
-                    bucket_name=self.model_bucket,
+                    container_name=self.model_container,
                     table_name=self.pred_log,
                 )
 
@@ -212,7 +212,7 @@ class Prediction:
                 self.blob.upload_df_as_csv(
                     data_frame=result,
                     file_name=self.pred_output_file,
-                    bucket=self.input_files_bucket,
+                    container=self.input_files_container,
                     dest_file_name=self.pred_output_file,
                     table_name=self.pred_log,
                 )
@@ -222,7 +222,7 @@ class Prediction:
             )
 
             return (
-                self.input_files_bucket,
+                self.input_files_container,
                 self.pred_output_file,
                 result.head().to_json(orient="records"),
             )

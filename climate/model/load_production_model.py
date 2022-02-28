@@ -22,7 +22,7 @@ class Load_Prod_Model:
 
         self.num_clusters = num_clusters
 
-        self.model_bucket = self.config["s3_bucket"]["climate_model_bucket"]
+        self.model_container = self.config["blob_container"]["climate_model_container"]
 
         self.load_prod_model_log = self.config["train_db_log"]["Load_Prod_Model"]
 
@@ -36,10 +36,10 @@ class Load_Prod_Model:
 
         self.mlflow_op = MLFlow_Operation(table_name=self.load_prod_model_log)
 
-    def create_folders_for_prod_and_stag(self, bucket_name, table_name):
+    def create_folders_for_prod_and_stag(self, container_name, table_name):
         """
         Method Name :   create_folders_for_prod_and_stag
-        Description :   This method is used for creating production and staging folder in blob bucket
+        Description :   This method is used for creating production and staging folder in blob container
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -55,13 +55,13 @@ class Load_Prod_Model:
 
         try:
             self.blob.create_folder(
-                bucket_name=bucket_name,
+                container_name=container_name,
                 folder_name=self.prod_model_dir,
                 table_name=table_name,
             )
 
             self.blob.create_folder(
-                bucket_name=bucket_name,
+                container_name=container_name,
                 folder_name=self.stag_model_dir,
                 table_name=table_name,
             )
@@ -101,7 +101,7 @@ class Load_Prod_Model:
 
         try:
             self.create_folders_for_prod_and_stag(
-                bucket_name=self.model_bucket, table_name=self.load_prod_model_log
+                container_name=self.model_container, table_name=self.load_prod_model_log
             )
 
             self.mlflow_op.set_mlflow_tracking_uri()
@@ -216,7 +216,7 @@ run_number  metrics.XGBoost0-best_score metrics.RandomForest1-best_score metrics
                             model_version=mv.version,
                             stage="Production",
                             model_name=mv.name,
-                            bucket=self.model_bucket,
+                            container=self.model_container,
                         )
 
                     ## In the registered models, even kmeans model is present, so during Prediction,
@@ -227,7 +227,7 @@ run_number  metrics.XGBoost0-best_score metrics.RandomForest1-best_score metrics
                             model_version=mv.version,
                             stage="Production",
                             model_name=mv.name,
-                            bucket=self.model_bucket,
+                            container=self.model_container,
                         )
 
                     else:
@@ -235,7 +235,7 @@ run_number  metrics.XGBoost0-best_score metrics.RandomForest1-best_score metrics
                             model_version=mv.version,
                             stage="Staging",
                             model_name=mv.name,
-                            bucket=self.model_bucket,
+                            container=self.model_container,
                         )
 
             self.log_writer.log(

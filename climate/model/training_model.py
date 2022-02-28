@@ -27,7 +27,7 @@ class train_model:
 
         self.model_train_log = self.config["train_db_log"]["model_training"]
 
-        self.model_bucket = self.config["s3_bucket"]["climate_model_bucket"]
+        self.model_container = self.config["blob_container"]["climate_model_container"]
 
         self.test_size = self.config["base"]["test_size"]
 
@@ -139,7 +139,7 @@ class train_model:
                 self.blob.save_model(
                     idx=i,
                     model=xgb_model,
-                    model_bucket=self.model_bucket,
+                    model_container=self.model_container,
                     table_name=self.model_train_log,
                     model_dir="",
                 )
@@ -147,7 +147,7 @@ class train_model:
                 self.blob.save_model(
                     idx=i,
                     model=rf_model,
-                    model_bucket=self.model_bucket,
+                    model_container=self.model_container,
                     table_name=self.model_train_log,
                     model_dir="",
                 )

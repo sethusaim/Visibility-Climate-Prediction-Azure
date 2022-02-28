@@ -14,10 +14,10 @@ class Raw_Pred_Data_Validation:
     Revisions   :   moved to setup to cloud
     """
 
-    def __init__(self, raw_data_bucket_name):
+    def __init__(self, raw_data_container_name):
         self.config = read_params()
 
-        self.raw_data_bucket_name = raw_data_bucket_name
+        self.raw_data_container_name = raw_data_container_name
 
         self.log_writer = App_Logger()
 
@@ -25,9 +25,9 @@ class Raw_Pred_Data_Validation:
 
         self.blob = Blob_Operation()
 
-        self.pred_data_bucket = self.config["s3_bucket"]["climate_pred_data_bucket"]
+        self.pred_data_container = self.config["blob_container"]["climate_pred_data_container"]
 
-        self.input_files_bucket = self.config["s3_bucket"]["input_files_bucket"]
+        self.input_files_container = self.config["blob_container"]["input_files_container"]
 
         self.raw_pred_data_dir = self.config["data"]["raw_data"]["pred_batch"]
 
@@ -70,7 +70,7 @@ class Raw_Pred_Data_Validation:
             )
 
             dic = self.blob.read_json(
-                bucket=self.input_files_bucket,
+                container=self.input_files_container,
                 filename=self.pred_schema_file,
                 table_name=self.pred_schema_log,
             )
@@ -139,7 +139,7 @@ class Raw_Pred_Data_Validation:
 
             regex = self.blob.read_text(
                 file_name=self.regex_file,
-                bucket_name=self.input_files_bucket,
+                container_name=self.input_files_container,
                 table_name=self.pred_gen_log,
             )
 
@@ -168,7 +168,7 @@ class Raw_Pred_Data_Validation:
     def create_dirs_for_good_bad_data(self, table_name):
         """
         Method Name :   create_dirs_for_good_bad_data
-        Description :   This method is used for creating directory for good and bad data in blob bucket
+        Description :   This method is used for creating directory for good and bad data in blob container
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -184,13 +184,13 @@ class Raw_Pred_Data_Validation:
 
         try:
             self.blob.create_folder(
-                bucket_name=self.pred_data_bucket,
+                container_name=self.pred_data_container,
                 folder_name=self.good_pred_data_dir,
                 table_name=table_name,
             )
 
             self.blob.create_folder(
-                bucket_name=self.pred_data_bucket,
+                container_name=self.pred_data_container,
                 folder_name=self.bad_pred_data_dir,
                 table_name=table_name,
             )
@@ -233,7 +233,7 @@ class Raw_Pred_Data_Validation:
             self.create_dirs_for_good_bad_data(table_name=self.pred_name_valid_log)
 
             onlyfiles = self.blob.get_files(
-                bucket=self.raw_data_bucket_name,
+                container=self.raw_data_container_name,
                 folder_name=self.raw_pred_data_dir,
                 table_name=self.pred_name_valid_log,
             )
@@ -265,36 +265,36 @@ class Raw_Pred_Data_Validation:
                     if len(splitAtDot[1]) == LengthOfDateStampInFile:
                         if len(splitAtDot[2]) == LengthOfTimeStampInFile:
                             self.blob.copy_data(
-                                src_bucket=self.raw_data_bucket_name,
+                                src_container=self.raw_data_container_name,
                                 src_file=raw_data_pred_filename,
-                                dest_bucket=self.pred_data_bucket,
+                                dest_container=self.pred_data_container,
                                 dest_file=good_data_pred_filename,
                                 table_name=self.pred_name_valid_log,
                             )
 
                         else:
                             self.blob.copy_data(
-                                src_bucket=self.raw_data_bucket_name,
+                                src_container=self.raw_data_container_name,
                                 src_file=raw_data_pred_filename,
-                                dest_bucket=self.pred_data_bucket,
+                                dest_container=self.pred_data_container,
                                 dest_file=bad_data_pred_filename,
                                 table_name=self.pred_name_valid_log,
                             )
 
                     else:
                         self.blob.copy_data(
-                            src_bucket=self.raw_data_bucket_name,
+                            src_container=self.raw_data_container_name,
                             src_file=raw_data_pred_filename,
-                            dest_bucket=self.pred_data_bucket,
+                            dest_container=self.pred_data_container,
                             dest_file=bad_data_pred_filename,
                             table_name=self.pred_name_valid_log,
                         )
 
                 else:
                     self.blob.copy_data(
-                        src_bucket=self.raw_data_bucket_name,
+                        src_container=self.raw_data_container_name,
                         src_file=raw_data_pred_filename,
-                        dest_bucket=self.pred_data_bucket,
+                        dest_container=self.pred_data_container,
                         dest_file=bad_data_pred_filename,
                         table_name=self.pred_name_valid_log,
                     )
@@ -333,7 +333,7 @@ class Raw_Pred_Data_Validation:
 
         try:
             lst = self.blob.read_csv(
-                bucket=self.pred_data_bucket,
+                container=self.pred_data_container,
                 file_name=self.good_pred_data_dir,
                 table_name=self.pred_col_valid_log,
                 folder=True,
@@ -354,9 +354,9 @@ class Raw_Pred_Data_Validation:
                         dest_f = self.bad_pred_data_dir + "/" + abs_f
 
                         self.blob.move_data(
-                            src_bucket=self.pred_data_bucket,
+                            src_container=self.pred_data_container,
                             src_file=file,
-                            dest_bucket=self.pred_data_bucket,
+                            dest_container=self.pred_data_container,
                             dest_file=dest_f,
                             table_name=self.pred_col_valid_log,
                         )
@@ -398,7 +398,7 @@ class Raw_Pred_Data_Validation:
 
         try:
             lst = self.blob.read_csv(
-                bucket=self.pred_data_bucket,
+                container=self.pred_data_container,
                 file_name=self.good_pred_data_dir,
                 table_name=self.pred_missing_value_log,
                 folder=True,
@@ -421,9 +421,9 @@ class Raw_Pred_Data_Validation:
                             dest_f = self.bad_pred_data_dir + "/" + abs_f
 
                             self.blob.move_data(
-                                src_bucket=self.pred_data_bucket,
+                                src_container=self.pred_data_container,
                                 src_file=file,
-                                dest_bucket=self.pred_data_bucket,
+                                dest_container=self.pred_data_container,
                                 dest_file=dest_f,
                                 table_name=self.pred_missing_value_log,
                             )
@@ -436,7 +436,7 @@ class Raw_Pred_Data_Validation:
                         self.blob.upload_df_as_csv(
                             data_frame=df,
                             file_name=abs_f,
-                            bucket=self.pred_data_bucket,
+                            container=self.pred_data_container,
                             dest_file_name=dest_f,
                             table_name=self.pred_missing_value_log,
                         )
