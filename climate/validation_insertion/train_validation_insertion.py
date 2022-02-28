@@ -26,15 +26,13 @@ class Train_Validation:
 
         self.class_name = self.__class__.__name__
 
-        self.db_name = self.config["db_log"]["db_train_log"]
+        self.db_name = self.config["db_log"]["train"]
 
         self.train_main_log = self.config["train_db_log"]["train_main"]
 
-        self.good_data_db_name = self.config["mongodb"]["climate_data_db_name"]
+        self.good_data_db_name = self.config["mongodb"]["train"]["db"]
 
-        self.good_data_collection_name = self.config["mongodb"][
-            "climate_train_data_collection"
-        ]
+        self.good_data_collection_name = self.config["mongodb"]["train"]["collection"]
 
         self.log_writer = App_Logger()
 
@@ -53,6 +51,7 @@ class Train_Validation:
                 key="start",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.train_main_log,
             )
 
@@ -74,13 +73,15 @@ class Train_Validation:
             self.raw_data.validate_missing_values_in_col()
 
             self.log_writer.log(
-                table_name=self.train_main_log,
-                log_message="Raw Data Validation Completed !!",
+                db_name=self.db_name,
+                collection_name=self.train_main_log,
+                log_info="Raw Data Validation Completed !!",
             )
 
             self.log_writer.log(
-                table_name=self.train_main_log,
-                log_message="Starting Data Transformation",
+                db_name=self.db_name,
+                collection_name=self.train_main_log,
+                log_info="Starting Data Transformation",
             )
 
             self.data_transform.rename_target_column()
@@ -88,8 +89,9 @@ class Train_Validation:
             self.data_transform.replace_missing_with_null()
 
             self.log_writer.log(
-                table_name=self.train_main_log,
-                log_message="Data Transformation completed !!",
+                db_name=self.db_name,
+                collection_name=self.train_main_log,
+                log_info="Data Transformation completed !!",
             )
 
             self.db_operation.insert_good_data_as_record(
@@ -98,8 +100,9 @@ class Train_Validation:
             )
 
             self.log_writer.log(
-                table_name=self.train_main_log,
-                log_message="Data type validation Operation completed !!",
+                db_name=self.db_name,
+                collection_name=self.train_main_log,
+                log_info="Data type validation Operation completed !!",
             )
 
             self.db_operation.export_collection_to_csv(
@@ -111,6 +114,7 @@ class Train_Validation:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.train_main_log,
             )
 
@@ -119,5 +123,6 @@ class Train_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.train_main_log,
             )

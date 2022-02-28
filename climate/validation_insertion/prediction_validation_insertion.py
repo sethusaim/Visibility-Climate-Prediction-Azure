@@ -7,7 +7,7 @@ from utils.read_params import read_params
 
 class Pred_Validation:
     """
-    Description :   This class is used for validating all the Prediction batch files
+    Description :   This class is used for validating all the prediction batch files
 
     Version     :   1.2
     Revisions   :   moved to setup to cloud
@@ -24,22 +24,20 @@ class Pred_Validation:
 
         self.class_name = self.__class__.__name__
 
-        self.db_name = self.config["db_log"]["db_pred_log"]
+        self.db_name = self.config["db_log"]["pred"]
 
         self.pred_main_log = self.config["pred_db_log"]["pred_main"]
 
-        self.good_data_db_name = self.config["mongodb"]["climate_data_db_name"]
+        self.good_data_db_name = self.config["mongodb"]["train"]["db"]
 
-        self.good_data_collection_name = self.config["mongodb"][
-            "climate_pred_data_collection"
-        ]
+        self.good_data_collection_name = self.config["mongodb"]["train"]["collection"]
 
         self.log_writer = App_Logger()
 
     def prediction_validation(self):
         """
         Method Name :   load_blob
-        Description :   This method is used for validating the Prediction btach files
+        Description :   This method is used for validating the prediction btach files
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
@@ -51,7 +49,8 @@ class Pred_Validation:
                 key="start",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_main_log,
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
             )
 
             (
@@ -72,13 +71,15 @@ class Pred_Validation:
             self.raw_data.validate_missing_values_in_col()
 
             self.log_writer.log(
-                table_name=self.pred_main_log,
-                log_message="Raw Data Validation Completed !!",
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
+                log_info="Raw Data Validation Completed !!",
             )
 
             self.log_writer.log(
-                table_name=self.pred_main_log,
-                log_message="Starting Data Transformation",
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
+                log_info="Starting Data Transformation",
             )
 
             self.data_transform.rename_target_column()
@@ -86,8 +87,9 @@ class Pred_Validation:
             self.data_transform.replace_missing_with_null()
 
             self.log_writer.log(
-                table_name=self.pred_main_log,
-                log_message="Data Transformation completed !!",
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
+                log_info="Data Transformation completed !!",
             )
 
             self.db_operation.insert_good_data_as_record(
@@ -96,8 +98,9 @@ class Pred_Validation:
             )
 
             self.log_writer.log(
-                table_name=self.pred_main_log,
-                log_message="Data type validation Operation completed !!",
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
+                log_info="Data type validation Operation completed !!",
             )
 
             self.db_operation.export_collection_to_csv(
@@ -109,7 +112,8 @@ class Pred_Validation:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_main_log,
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
             )
 
         except Exception as e:
@@ -117,5 +121,6 @@ class Pred_Validation:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_main_log,
+                db_name=self.db_name,
+                collection_name=self.pred_main_log,
             )
