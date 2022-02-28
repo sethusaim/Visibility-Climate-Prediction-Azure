@@ -50,7 +50,7 @@ class Data_Getter_Train:
         try:
             df = self.blob.read_csv(
                 container_name=self.input_files,
-                file_name=self.train_csv_file,
+                local_file_name=self.train_csv_file,
                 db_name=self.db_name,
                 collection_name=self.collection_name,
             )

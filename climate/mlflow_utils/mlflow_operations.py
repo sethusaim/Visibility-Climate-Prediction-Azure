@@ -696,7 +696,7 @@ class MLFlow_Operations:
                     collection_name=self.collection_name,
                     src_container_name=src_container,
                     dest_container_name=dest_container,
-                    local_file_name=trained_model_file,
+                    local_local_file_name=trained_model_file,
                     container_file_name=prod_model_file,
                 )
 
@@ -717,7 +717,7 @@ class MLFlow_Operations:
 
                 self.blob.copy_data(
                     src_container=src_container,
-                    local_file_name=trained_model_file,
+                    local_local_file_name=trained_model_file,
                     dest_container=dest_container,
                     container_file_name=stag_model_file,
                     db_name=self.db_name,

@@ -64,7 +64,7 @@ class Train_Validation:
 
             regex = self.raw_data.get_regex_pattern()
 
-            self.raw_data.validate_raw_file_name(
+            self.raw_data.validate_raw_local_file_name(
                 regex, LengthOfDateStampInFile, LengthOfTimeStampInFile
             )
 

@@ -95,7 +95,7 @@ class KMeans_Clustering:
                 db_name=self.db_name,
                 collection_name=self.collection_name,
                 container_name=self.input_files,
-                local_file_name=self.elbow_plot_file,
+                local_local_file_name=self.elbow_plot_file,
                 container_file_name=self.elbow_plot_file,
             )
 

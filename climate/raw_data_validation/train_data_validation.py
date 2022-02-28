@@ -75,7 +75,7 @@ class Raw_Train_Data_Validation:
                 db_name=self.db_name,
                 collection_name=self.train_schema_log,
                 container_name=self.input_files,
-                file_name=self.train_schema_file,
+                local_file_name=self.train_schema_file,
             )
 
             LengthOfDateStampInFile = dic["LengthOfDateStampInFile"]
@@ -145,7 +145,7 @@ class Raw_Train_Data_Validation:
             )
 
             regex = self.blob.read_text(
-                file_name=self.regex_file,
+                local_file_name=self.regex_file,
                 container_name=self.input_files,
                 db_name=self.db_name,
                 collection_name=self.train_gen_log,
@@ -176,17 +176,17 @@ class Raw_Train_Data_Validation:
                 collection_name=self.train_gen_log,
             )
 
-    def validate_raw_file_name(
+    def validate_raw_local_file_name(
         self, regex, LengthOfDateStampInFile, LengthOfTimeStampInFile
     ):
         """
-        Method Name :   validate_raw_file_name
+        Method Name :   validate_raw_local_file_name
         Description :   This method is used for validating raw file name based on the regex pattern
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
         """
-        method_name = self.validate_raw_file_name.__name__
+        method_name = self.validate_raw_local_file_name.__name__
 
         self.log_writer.start_log(
             key="start",
@@ -237,7 +237,7 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.train_data_container,
-                                local_file_name=raw_data_train_filename,
+                                local_local_file_name=raw_data_train_filename,
                                 container_file_name=good_data_train_filename,
                             )
 
@@ -247,7 +247,7 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.train_data_container,
-                                local_file_name=raw_data_train_filename,
+                                local_local_file_name=raw_data_train_filename,
                                 container_file_name=bad_data_train_filename,
                             )
 
@@ -257,7 +257,7 @@ class Raw_Train_Data_Validation:
                             collection_name=self.train_name_valid_log,
                             src_container_name=self.raw_data_container_name,
                             dest_container_name=self.train_data_container,
-                            local_file_name=raw_data_train_filename,
+                            local_local_file_name=raw_data_train_filename,
                             container_file_name=bad_data_train_filename,
                         )
 
@@ -267,7 +267,7 @@ class Raw_Train_Data_Validation:
                         collection_name=self.train_name_valid_log,
                         src_container_name=self.raw_data_container_name,
                         dest_container_name=self.train_data_container,
-                        local_file_name=raw_data_train_filename,
+                        local_local_file_name=raw_data_train_filename,
                         container_file_name=bad_data_train_filename,
                     )
 
@@ -333,7 +333,7 @@ class Raw_Train_Data_Validation:
                             collection_name=self.train_col_valid_log,
                             src_container_name=self.train_data_container,
                             dest_container_name=self.train_data_container,
-                            local_file_name=file,
+                            local_local_file_name=file,
                             container_file_name=dest_f,
                         )
 
@@ -404,7 +404,7 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_missing_value_log,
                                 src_container_name=self.train_data_container,
                                 dest_container_name=self.train_data_container,
-                                local_file_name=file,
+                                local_local_file_name=file,
                                 container_file_name=dest_f,
                             )
 
@@ -418,7 +418,7 @@ class Raw_Train_Data_Validation:
                             collection_name=self.train_missing_value_log,
                             container_name=self.train_data_container,
                             dataframe=df,
-                            file_name=abs_f,
+                            local_file_name=abs_f,
                             container_file_name=dest_f,
                         )
 

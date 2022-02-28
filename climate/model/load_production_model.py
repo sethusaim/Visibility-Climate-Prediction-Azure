@@ -35,7 +35,7 @@ class Load_Prod_Model:
 
         self.blob = Blob_Operation()
 
-        self.mlflow_op = MLFlow_Operations(table_name=self.load_prod_model_log)
+        self.mlflow_op = MLFlow_Operations(collection_name=self.load_prod_model_log)
 
     def load_production_model(self):
         """

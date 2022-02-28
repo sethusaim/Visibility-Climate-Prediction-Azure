@@ -310,7 +310,7 @@ class Preprocessor:
                 collection_name=self.collection_name,
                 container_name=self.input_files_container,
                 dataframe=self.dataframe_with_null,
-                file_name=self.null_values_file,
+                local_file_name=self.null_values_file,
                 container_file_name=self.null_values_file,
             )
 

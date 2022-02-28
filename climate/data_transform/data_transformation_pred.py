@@ -14,7 +14,7 @@ class Data_Transform_Pred:
     def __init__(self):
         self.config = read_params()
 
-        self.pred_data_bucket = self.config["blob_bucket"]["climate_pred_data_bucket"]
+        self.pred_data_container = self.config["container"]["climate_pred_data"]
 
         self.blob = Blob_Operation()
 
@@ -23,6 +23,8 @@ class Data_Transform_Pred:
         self.good_pred_data_dir = self.config["data"]["pred"]["good_data_dir"]
 
         self.class_name = self.__class__.__name__
+
+        self.db_name = self.config["db_log"]["pred"]
 
         self.pred_data_transform_log = self.config["pred_db_log"]["data_transform"]
 
@@ -40,15 +42,16 @@ class Data_Transform_Pred:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.pred_data_transform_log,
+            db_name=self.db_name,
+            collection_name=self.pred_data_transform_log,
         )
 
         try:
-            lst = self.blob.read_csv(
-                bucket=self.pred_data_bucket,
-                file_name=self.good_pred_data_dir,
-                folder=True,
-                table_name=self.pred_data_transform_log,
+            lst = self.blob.read_csv_from_folder(
+                folder_name=self.good_pred_data_dir,
+                container_name=self.pred_data_container,
+                db_name=self.db_name,
+                collection_name=self.pred_data_transform_log,
             )
 
             for idx, f in enumerate(lst):
@@ -62,16 +65,18 @@ class Data_Transform_Pred:
                     df["DATE"] = df["DATE"].apply(lambda x: "'" + str(x) + "'")
 
                     self.log_writer.log(
-                        table_name=self.pred_data_transform_log,
+                        db_name=self.db_name,
+                        collection_name=self.pred_data_transform_log,
                         log_info=f"Quotes added for the file {file}",
                     )
 
                     self.blob.upload_df_as_csv(
-                        data_frame=df,
-                        file_name=abs_f,
-                        bucket=self.pred_data_bucket,
-                        dest_file_name=file,
-                        table_name=self.pred_data_transform_log,
+                        db_name=self.db_name,
+                        collection_name=self.pred_data_transform_log,
+                        container_name=self.pred_data_container,
+                        dataframe=df,
+                        local_file_name=file,
+                        container_file_name=file,
                     )
 
                 else:
@@ -81,7 +86,8 @@ class Data_Transform_Pred:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_data_transform_log,
+                db_name=self.db_name,
+                collection_name=self.pred_data_transform_log,
             )
 
         except Exception as e:
@@ -89,5 +95,6 @@ class Data_Transform_Pred:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.pred_data_transform_log,
+                db_name=self.db_name,
+                collection_name=self.pred_data_transform_log,
             )

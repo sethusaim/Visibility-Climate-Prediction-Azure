@@ -33,9 +33,9 @@ class Prediction:
 
         self.blob = Blob_Operation()
 
-        self.Data_Getter_Pred = Data_Getter_Pred(table_name=self.pred_log)
+        self.Data_Getter_Pred = Data_Getter_Pred(collection_name=self.pred_log)
 
-        self.Preprocessor = Preprocessor(table_name=self.pred_log)
+        self.Preprocessor = Preprocessor(collection_name=self.pred_log)
 
         self.class_name = self.__class__.__name__
 
@@ -242,7 +242,7 @@ class Prediction:
                     collection_name=self.pred_log,
                     container_file_name=self.input_files,
                     dataframe=result,
-                    file_name=self.pred_output_file,
+                    local_file_name=self.pred_output_file,
                 )
 
             self.log_writer.log(

@@ -52,7 +52,7 @@ class Data_Getter_Pred:
                 db_name=self.db_name,
                 collection_name=self.collection_name,
                 container_name=self.input_files,
-                file_name=self.pred_file,
+                local_file_name=self.pred_file,
             )
 
             self.log_writer.start_log(
