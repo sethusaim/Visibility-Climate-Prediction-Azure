@@ -25,9 +25,9 @@ class Raw_Pred_Data_Validation:
 
         self.blob = Blob_Operation()
 
-        self.pred_data_container = self.config["blob_container"]["climate_pred_data_container"]
+        self.pred_data_container = self.config["container"]["climate_pred_data_container"]
 
-        self.input_files_container = self.config["blob_container"]["input_files_container"]
+        self.input_files_container = self.config["container"]["input_files_container"]
 
         self.raw_pred_data_dir = self.config["data"]["raw_data"]["pred_batch"]
 

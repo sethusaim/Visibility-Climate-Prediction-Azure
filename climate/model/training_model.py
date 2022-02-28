@@ -27,7 +27,7 @@ class train_model:
 
         self.model_train_log = self.config["train_db_log"]["model_training"]
 
-        self.model_container = self.config["blob_container"]["climate_model_container"]
+        self.model_container = self.config["container"]["climate_model_container"]
 
         self.test_size = self.config["base"]["test_size"]
 

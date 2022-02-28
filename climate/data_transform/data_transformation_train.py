@@ -1,4 +1,3 @@
-
 from climate.blob_storage_operations.blob_operations import Blob_Operation
 from utils.logger import App_Logger
 from utils.read_params import read_params
@@ -15,7 +14,7 @@ class Data_Transform_Train:
     def __init__(self):
         self.config = read_params()
 
-        self.train_data_container = self.config["blob_container"]["climate_train_data_container"]
+        self.train_data_container = self.config["container"]["climate_train_data"]
 
         self.blob = Blob_Operation()
 

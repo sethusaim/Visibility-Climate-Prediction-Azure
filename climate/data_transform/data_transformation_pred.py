@@ -1,4 +1,3 @@
-
 from climate.blob_storage_operations.blob_operations import Blob_Operation
 from utils.logger import App_Logger
 from utils.read_params import read_params
@@ -6,7 +5,7 @@ from utils.read_params import read_params
 
 class Data_Transform_Pred:
     """
-    Description :  This class shall be used for transforming the Prediction batch data before loading it in Database!!.
+    Description :  This class shall be used for transforming the prediction batch data before loading it in Database!!.
 
     Version     :   1.2
     Revisions   :   None
@@ -15,7 +14,7 @@ class Data_Transform_Pred:
     def __init__(self):
         self.config = read_params()
 
-        self.pred_data_container = self.config["blob_container"]["climate_pred_data_container"]
+        self.pred_data_bucket = self.config["blob_bucket"]["climate_pred_data_bucket"]
 
         self.blob = Blob_Operation()
 
@@ -46,7 +45,7 @@ class Data_Transform_Pred:
 
         try:
             lst = self.blob.read_csv(
-                container=self.pred_data_container,
+                bucket=self.pred_data_bucket,
                 file_name=self.good_pred_data_dir,
                 folder=True,
                 table_name=self.pred_data_transform_log,
@@ -70,7 +69,7 @@ class Data_Transform_Pred:
                     self.blob.upload_df_as_csv(
                         data_frame=df,
                         file_name=abs_f,
-                        container=self.pred_data_container,
+                        bucket=self.pred_data_bucket,
                         dest_file_name=file,
                         table_name=self.pred_data_transform_log,
                     )

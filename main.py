@@ -46,7 +46,7 @@ async def index(request: Request):
 @app.get("/train")
 async def trainRouteClient():
     try:
-        raw_data_train_container_name = config["blob_container"]["climate_raw_data_container"]
+        raw_data_train_container_name = config["container"]["climate_raw_data_container"]
 
         table_obj = create_log_table()
 
@@ -75,7 +75,7 @@ async def trainRouteClient():
 @app.get("/predict")
 async def predictRouteClient():
     try:
-        raw_data_pred_container_name = config["blob_container"]["climate_raw_data_container"]
+        raw_data_pred_container_name = config["container"]["climate_raw_data_container"]
 
         table_obj = create_log_table()
 

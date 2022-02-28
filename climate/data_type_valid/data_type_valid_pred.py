@@ -18,13 +18,13 @@ class DB_Operation_Pred:
 
         self.class_name = self.__class__.__name__
 
-        self.pred_data_container = self.config["blob_container"]["climate_pred_data_container"]
+        self.pred_data_container = self.config["container"]["climate_pred_data_container"]
 
         self.pred_export_csv_file = self.config["export_csv_file"]["pred"]
 
         self.good_data_pred_dir = self.config["data"]["pred"]["good_data_dir"]
 
-        self.input_files_container = self.config["blob_container"]["input_files_container"]
+        self.input_files_container = self.config["container"]["input_files_container"]
 
         self.pred_db_insert_log = self.config["pred_db_log"]["db_insert"]
 
