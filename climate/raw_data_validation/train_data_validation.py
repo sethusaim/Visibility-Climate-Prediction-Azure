@@ -237,8 +237,8 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.train_data_container,
-                                src_file=raw_data_train_filename,
-                                dest_file=good_data_train_filename,
+                                local_file_name=raw_data_train_filename,
+                                container_file_name=good_data_train_filename,
                             )
 
                         else:
@@ -247,8 +247,8 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_name_valid_log,
                                 src_container_name=self.raw_data_container_name,
                                 dest_container_name=self.train_data_container,
-                                src_file=raw_data_train_filename,
-                                dest_file=bad_data_train_filename,
+                                local_file_name=raw_data_train_filename,
+                                container_file_name=bad_data_train_filename,
                             )
 
                     else:
@@ -257,8 +257,8 @@ class Raw_Train_Data_Validation:
                             collection_name=self.train_name_valid_log,
                             src_container_name=self.raw_data_container_name,
                             dest_container_name=self.train_data_container,
-                            src_file=raw_data_train_filename,
-                            dest_file=bad_data_train_filename,
+                            local_file_name=raw_data_train_filename,
+                            container_file_name=bad_data_train_filename,
                         )
 
                 else:
@@ -267,8 +267,8 @@ class Raw_Train_Data_Validation:
                         collection_name=self.train_name_valid_log,
                         src_container_name=self.raw_data_container_name,
                         dest_container_name=self.train_data_container,
-                        src_file=raw_data_train_filename,
-                        dest_file=bad_data_train_filename,
+                        local_file_name=raw_data_train_filename,
+                        container_file_name=bad_data_train_filename,
                     )
 
             self.log_writer.start_log(
@@ -333,8 +333,8 @@ class Raw_Train_Data_Validation:
                             collection_name=self.train_col_valid_log,
                             src_container_name=self.train_data_container,
                             dest_container_name=self.train_data_container,
-                            src_file=file,
-                            dest_file=dest_f,
+                            local_file_name=file,
+                            container_file_name=dest_f,
                         )
 
                 else:
@@ -404,8 +404,8 @@ class Raw_Train_Data_Validation:
                                 collection_name=self.train_missing_value_log,
                                 src_container_name=self.train_data_container,
                                 dest_container_name=self.train_data_container,
-                                src_file=file,
-                                dest_file=dest_f,
+                                local_file_name=file,
+                                container_file_name=dest_f,
                             )
 
                             break

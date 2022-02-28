@@ -14,14 +14,16 @@ class Preprocessor:
     Revisions   :   moved setup to cloud
     """
 
-    def __init__(self, table_name):
+    def __init__(self, db_name, collection_name):
         self.log_writer = App_Logger()
 
         self.config = read_params()
 
         self.class_name = self.__class__.__name__
 
-        self.table_name = table_name
+        self.db_name = db_name
+
+        self.collection_name = collection_name
 
         self.null_values_file = self.config["null_values_csv_file"]
 
@@ -52,7 +54,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         self.data = data
@@ -63,28 +66,34 @@ class Preprocessor:
             self.useful_data = self.data.drop(labels=self.columns, axis=1)
 
             self.log_writer.log(
-                table_name=self.table_name, log_info="Column removal Successful"
+                db_name=self.db_name,
+                collection_name=self.collection_name,
+                log_info="Column removal Successful",
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return self.useful_data
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name, log_info="Column removal Unsuccessful"
+                db_name=self.db_name,
+                collection_name=self.collection_name,
+                log_info="Column removal Unsuccessful",
             )
 
             self.log_writer.exception_log(
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def separate_label_feature(self, data, label_column_name):
@@ -105,7 +114,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
@@ -114,7 +124,8 @@ class Preprocessor:
             self.Y = data[label_column_name]
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Label Separation Successful",
             )
 
@@ -122,14 +133,16 @@ class Preprocessor:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return self.X, self.Y
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Label Separation Unsuccessful",
             )
 
@@ -137,7 +150,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def drop_unnecessary_columns(self, data, columnNameList):
@@ -156,21 +170,25 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
             data = data.drop(columnNameList, axis=1)
 
             self.log_writer.log(
-                table_name=self.table_name, log_info="Dropped unnecessary columns"
+                db_name=self.db_name,
+                collection_name=self.collection_name,
+                log_info="Dropped unnecessary columns",
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return data
@@ -180,7 +198,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def replace_invalid_with_null(self, data):
@@ -198,7 +217,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
@@ -209,7 +229,8 @@ class Preprocessor:
                     data[column] = data[column].replace("?", np.nan)
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Replaced invalid values with np.nan",
             )
 
@@ -217,7 +238,8 @@ class Preprocessor:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return data
@@ -227,7 +249,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def is_null_present(self, data):
@@ -248,7 +271,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         self.null_present = False
@@ -276,29 +300,34 @@ class Preprocessor:
                 )
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Created data frame with null values",
             )
 
             self.blob.upload_df_as_csv(
-                data_frame=self.dataframe_with_null,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
+                container_name=self.input_files_container,
+                dataframe=self.dataframe_with_null,
                 file_name=self.null_values_file,
-                container=self.input_files_container,
-                dest_file_name=self.null_values_file,
+                container_file_name=self.null_values_file,
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return self.null_present
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Finding missing values failed",
             )
 
@@ -306,7 +335,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def encode_target_cols(self, data):
@@ -326,7 +356,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
@@ -336,14 +367,17 @@ class Preprocessor:
                 data = pd.get_dummies(data, columns=[column])
 
             self.log_writer.log(
-                table_name=self.table_name, log_info="Encoded target columns"
+                db_name=self.db_name,
+                collection_name=self.collection_name,
+                log_info="Encoded target columns",
             )
 
             self.log_writer.start_log(
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return data
@@ -353,7 +387,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def apply_standard_scaler(self, X):
@@ -373,7 +408,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         try:
@@ -382,7 +418,8 @@ class Preprocessor:
             X_scaled = scalar.fit_transform(X)
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info=f"Transformed data using {scalar.__class__.__name__}",
             )
 
@@ -390,7 +427,8 @@ class Preprocessor:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return X_scaled
@@ -400,7 +438,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def impute_missing_values(self, data):
@@ -420,7 +459,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         self.data = data
@@ -433,14 +473,16 @@ class Preprocessor:
             )
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info=f"Initialized {imputer.__class__.__name__}",
             )
 
             self.new_array = imputer.fit_transform(self.data)
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Imputed missing values using KNN imputer",
             )
 
@@ -449,12 +491,14 @@ class Preprocessor:
             )
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Created new dataframe with imputed values",
             )
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Imputing missing values Successful",
             )
 
@@ -462,7 +506,8 @@ class Preprocessor:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return self.new_data
@@ -472,7 +517,8 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
     def get_columns_with_zero_std_deviation(self, data):
@@ -492,7 +538,8 @@ class Preprocessor:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
-            table_name=self.table_name,
+            db_name=self.db_name,
+            collection_name=self.collection_name,
         )
 
         self.columns = data.columns
@@ -507,7 +554,8 @@ class Preprocessor:
                     self.col_to_drop.append(x)
 
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Column search for Standard Deviation of Zero Successful",
             )
 
@@ -515,14 +563,16 @@ class Preprocessor:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             return self.col_to_drop
 
         except Exception as e:
             self.log_writer.log(
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
                 log_info="Column search for Standard Deviation of Zero Failed",
             )
 
@@ -530,5 +580,6 @@ class Preprocessor:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
-                table_name=self.table_name,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
