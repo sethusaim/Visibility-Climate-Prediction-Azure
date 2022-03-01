@@ -1,7 +1,7 @@
-from utils.logger import App_Logger
-from utils.read_params import read_params
 from climate.blob_storage_operations.blob_operations import Blob_Operation
 from climate.mongo_db_operations.mongo_operations import MongoDB_Operation
+from utils.logger import App_Logger
+from utils.read_params import read_params
 
 
 class DB_Operation_Pred:
@@ -25,7 +25,7 @@ class DB_Operation_Pred:
 
         self.good_data_pred_dir = self.config["data"]["pred"]["good"]
 
-        self.input_files = self.config["pred_container"]["input_files"]
+        self.input_files_container = self.config["pred_container"]["input_files"]
 
         self.pred_db_insert_log = self.config["pred_db_log"]["db_insert"]
 
@@ -126,10 +126,10 @@ class DB_Operation_Pred:
             )
 
             self.blob.upload_df_as_csv(
-                data_frame=df,
-                file_name=self.pred_export_csv_file,
-                container=self.input_files,
-                to_file_name=self.pred_export_csv_file,
+                dataframe=df,
+                local_file_name=self.pred_export_csv_file,
+                container_file_name=self.pred_export_csv_file,
+                container_name=self.input_files_container,
                 db_name=self.db_name,
                 collection_name=self.pred_export_csv_log,
             )
