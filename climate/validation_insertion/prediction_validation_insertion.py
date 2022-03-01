@@ -5,7 +5,7 @@ from utils.logger import App_Logger
 from utils.read_params import read_params
 
 
-class pred_validation:
+class Pred_Validation:
     """
     Description :   This class is used for validating all the prediction batch files
 
