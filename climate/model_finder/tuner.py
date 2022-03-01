@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestRegressor
 from utils.logger import App_Logger
-from utils.model_utils import get_model_name, get_model_params, get_model_score
+from utils.model_utils import Model_Utils
 from utils.read_params import read_params
 from xgboost import XGBRegressor
 
@@ -13,7 +13,9 @@ class Model_Finder:
     Revisions: None
     """
 
-    def __init__(self, collection_name):
+    def __init__(self,db_name,collection_name):
+        self.db_name = db_name 
+
         self.collection_name = collection_name
 
         self.class_name = self.__class__.__name__
@@ -23,6 +25,8 @@ class Model_Finder:
         self.cv = self.config["model_utils"]["cv"]
 
         self.verbose = self.config["model_utils"]["verbose"]
+
+        self.model_utils = Model_Utils()
 
         self.log_writer = App_Logger()
 
@@ -52,15 +56,16 @@ class Model_Finder:
         )
 
         try:
-            self.rf_model_name = get_model_name(
-                model=self.rf_model, collection_name=self.collection_name
+            self.rf_model_name = self.model_utils.get_model_name(
+                model=self.rf_model, db_name=self.db_name,collection_name=self.collection_name
             )
 
-            self.rf_best_params = get_model_params(
+            self.rf_best_params = self.model_utils.get_model_params(
                 model=self.rf_model,
                 model_key_name="rf_model",
                 x_train=train_x,
                 y_train=train_y,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -73,6 +78,7 @@ class Model_Finder:
             self.n_estimators = self.rf_best_params["n_estimators"]
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"{self.rf_model_name} model best params are {self.rf_best_params}",
             )
@@ -85,6 +91,7 @@ class Model_Finder:
             )
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"Initialized {self.rf_model_name} with {self.rf_best_params} as params",
             )
@@ -92,6 +99,7 @@ class Model_Finder:
             rf_model.fit(train_x, train_y)
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"Created {self.rf_model_name} based on the {self.rf_best_params} as params",
             )
@@ -100,6 +108,7 @@ class Model_Finder:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -110,6 +119,7 @@ class Model_Finder:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -131,19 +141,21 @@ class Model_Finder:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
+            db_name=self.db_name,
             collection_name=self.collection_name,
         )
 
         try:
-            self.xgb_model_name = get_model_name(
-                model=self.xgb_model, collection_name=self.collection_name
+            self.xgb_model_name = self.model_utils.get_model_name(
+                model=self.xgb_model, db_name=self.db_name,collection_name=self.collection_name
             )
 
-            self.xgb_best_params = get_model_params(
+            self.xgb_best_params = self.model_utils.get_model_params(
                 model=self.xgb_model,
                 model_key_name="xgb_model",
                 x_train=train_x,
                 y_train=train_y,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -154,6 +166,7 @@ class Model_Finder:
             self.n_estimators = self.rf_best_params["n_estimators"]
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"{self.xgb_model} model best params are {self.xgb_best_params}",
             )
@@ -165,6 +178,7 @@ class Model_Finder:
             )
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"Initialized {self.xgb_model_name} model with best params as {self.xgb_best_params}",
             )
@@ -172,6 +186,7 @@ class Model_Finder:
             xgb_model.fit(train_x, train_y)
 
             self.log_writer.log(
+                db_name=self.db_name,
                 collection_name=self.collection_name,
                 log_info=f"Created {self.xgb_model_name} model with best params as {self.xgb_best_params}",
             )
@@ -180,6 +195,7 @@ class Model_Finder:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -190,6 +206,7 @@ class Model_Finder:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -210,25 +227,28 @@ class Model_Finder:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
+            db_name=self.db_name,
             collection_name=self.collection_name,
         )
 
         try:
             xgb_model = self.get_best_params_for_xgboost(train_x, train_y)
 
-            xgb_model_score = get_model_score(
+            xgb_model_score = self.model_utils.get_model_score(
                 model=xgb_model,
                 test_x=test_x,
                 test_y=test_y,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
             rf_model = self.get_best_model_for_random_forest(train_x, train_y)
 
-            rf_model_score = get_model_score(
+            rf_model_score = self.model_utils.get_model_score(
                 model=rf_model,
                 test_x=test_x,
                 test_y=test_y,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -236,6 +256,7 @@ class Model_Finder:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.collection_name,
             )
 
@@ -245,5 +266,6 @@ class Model_Finder:
             self.log_writer.exception_log(
                 error=e,
                 class_name=self.class_name,
+                db_name=self.db_name,
                 method_name=method_name,
             )
