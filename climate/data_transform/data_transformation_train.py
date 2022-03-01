@@ -24,6 +24,8 @@ class Data_Transform_Train:
 
         self.class_name = self.__class__.__name__
 
+        self.db_name = self.config["db_log"]["train"]
+
         self.train_data_transform_log = self.config["train_db_log"]["data_transform"]
 
     def add_quotes_to_string(self):
@@ -40,14 +42,15 @@ class Data_Transform_Train:
             key="start",
             class_name=self.class_name,
             method_name=method_name,
+            db_name=self.db_name,
             collection_name=self.train_data_transform_log,
         )
 
         try:
-            lst = self.blob.read_csv(
-                container=self.train_data_container,
-                local_file_name=self.good_train_data_dir,
-                folder=True,
+            lst = self.blob.read_csv_from_folder(
+                folder_name=self.good_train_data_dir,
+                container_name=self.train_data_container,
+                db_name=self.db_name,
                 collection_name=self.train_data_transform_log,
             )
 
@@ -62,15 +65,17 @@ class Data_Transform_Train:
                     df["DATE"] = df["DATE"].apply(lambda x: "'" + str(x) + "'")
 
                     self.log_writer.log(
+                        db_name=self.db_name,
                         collection_name=self.train_data_transform_log,
                         log_info=f"Quotes added for the file {file}",
                     )
 
                     self.blob.upload_df_as_csv(
-                        data_frame=df,
+                        dataframe=df,
                         local_file_name=abs_f,
-                        container=self.train_data_container,
-                        dest_local_file_name=file,
+                        container_file_name=file,
+                        container_name=self.train_data_container,
+                        db_name=self.db_name,
                         collection_name=self.train_data_transform_log,
                     )
 
@@ -81,6 +86,7 @@ class Data_Transform_Train:
                 key="exit",
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.train_data_transform_log,
             )
 
@@ -89,5 +95,6 @@ class Data_Transform_Train:
                 error=e,
                 class_name=self.class_name,
                 method_name=method_name,
+                db_name=self.db_name,
                 collection_name=self.train_data_transform_log,
             )

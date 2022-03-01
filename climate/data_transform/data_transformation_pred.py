@@ -59,8 +59,6 @@ class Data_Transform_Pred:
 
                 file = f[idx][1]
 
-                abs_f = f[idx][2]
-
                 if file.endswith(".csv"):
                     df["DATE"] = df["DATE"].apply(lambda x: "'" + str(x) + "'")
 
@@ -71,12 +69,12 @@ class Data_Transform_Pred:
                     )
 
                     self.blob.upload_df_as_csv(
-                        db_name=self.db_name,
-                        collection_name=self.pred_data_transform_log,
-                        container_name=self.pred_data_container,
                         dataframe=df,
                         local_file_name=file,
                         container_file_name=file,
+                        container_name=self.pred_data_container,
+                        db_name=self.db_name,
+                        collection_name=self.pred_data_transform_log,
                     )
 
                 else:
