@@ -5,7 +5,7 @@ from utils.read_params import read_params
 
 class Data_Transform_Train:
     """
-    Description :  This class shall be used for transforming the training batch data before loading it in Database!!.
+    Description :  This class shall be used for transforming the trainiction batch data before loading it in Database!!.
 
     Version     :   1.2
     Revisions   :   None
@@ -13,6 +13,8 @@ class Data_Transform_Train:
 
     def __init__(self):
         self.config = read_params()
+
+        self.db_name = self.config["db_log"]["train"]
 
         self.train_data_container = self.config["container"]["climate_train_data"]
 
@@ -23,8 +25,6 @@ class Data_Transform_Train:
         self.good_train_data_dir = self.config["data"]["train"]["good_data_dir"]
 
         self.class_name = self.__class__.__name__
-
-        self.db_name = self.config["db_log"]["train"]
 
         self.train_data_transform_log = self.config["train_db_log"]["data_transform"]
 
@@ -67,7 +67,7 @@ class Data_Transform_Train:
                     self.log_writer.log(
                         db_name=self.db_name,
                         collection_name=self.train_data_transform_log,
-                        log_info=f"Quotes added for the file {file}",
+                        log_message=f"Quotes added for the file {file}",
                     )
 
                     self.blob.upload_df_as_csv(

@@ -14,6 +14,8 @@ class Data_Transform_Pred:
     def __init__(self):
         self.config = read_params()
 
+        self.db_name = self.config["db_log"]["pred"]
+
         self.pred_data_container = self.config["container"]["climate_pred_data"]
 
         self.blob = Blob_Operation()
@@ -23,8 +25,6 @@ class Data_Transform_Pred:
         self.good_pred_data_dir = self.config["data"]["pred"]["good_data_dir"]
 
         self.class_name = self.__class__.__name__
-
-        self.db_name = self.config["db_log"]["pred"]
 
         self.pred_data_transform_log = self.config["pred_db_log"]["data_transform"]
 
@@ -59,18 +59,20 @@ class Data_Transform_Pred:
 
                 file = f[idx][1]
 
+                abs_f = f[idx][2]
+
                 if file.endswith(".csv"):
                     df["DATE"] = df["DATE"].apply(lambda x: "'" + str(x) + "'")
 
                     self.log_writer.log(
                         db_name=self.db_name,
                         collection_name=self.pred_data_transform_log,
-                        log_info=f"Quotes added for the file {file}",
+                        log_message=f"Quotes added for the file {file}",
                     )
 
                     self.blob.upload_df_as_csv(
                         dataframe=df,
-                        local_file_name=file,
+                        local_file_name=abs_f,
                         container_file_name=file,
                         container_name=self.pred_data_container,
                         db_name=self.db_name,
