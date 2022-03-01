@@ -187,7 +187,7 @@ class Blob_Operation:
                 collection_name=collection_name,
             )
 
-    def load_file(self, container_name, file_name, db_name, collection_name):
+    def load_file(self, file_name, container_name, db_name, collection_name):
         method_name = self.load_file.__name__
 
         self.log_writer.start_log(

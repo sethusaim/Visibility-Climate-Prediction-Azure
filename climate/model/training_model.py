@@ -143,21 +143,21 @@ class Train_Model:
                 )
 
                 self.blob.save_model(
-                    db_name=self.db_name,
-                    collection_name=self.model_train_log,
-                    container_name=self.model_container,
                     model=xgb_model,
                     idx=i,
                     model_dir=self.train_model_dir,
+                    container_name=self.model_container,
+                    db_name=self.db_name,
+                    collection_name=self.model_train_log,
                 )
 
                 self.blob.save_model(
-                    idx=i,
                     model=rf_model,
+                    idx=i,
+                    model_dir=self.train_model_dir,
                     model_container=self.model_container,
                     db_name=self.db_name,
                     collection_name=self.model_train_log,
-                    model_dir=self.train_model_dir,
                 )
 
                 try:
@@ -210,6 +210,14 @@ class Train_Model:
                 db_name=self.db_name,
                 collection_name=self.model_train_log,
                 log_info="Successful End of Training",
+            )
+
+            self.log_writer.start_log(
+                key="exit",
+                class_name=self.class_name,
+                method_name=method_name,
+                db_name=self.db_name,
+                collection_name=self.model_train_log,
             )
 
             return number_of_clusters
