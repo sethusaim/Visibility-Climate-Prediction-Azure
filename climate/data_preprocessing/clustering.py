@@ -20,7 +20,7 @@ class KMeans_Clustering:
 
         self.config = read_params()
 
-        self.input_files = self.config["container"]["input_files"]
+        self.input_files_container = self.config["container"]["input_files"]
 
         self.model_container = self.config["container"]["wafer_model_container"]
 
@@ -92,11 +92,11 @@ class KMeans_Clustering:
             )
 
             self.blob.upload_file(
-                db_name=self.db_name,
-                collection_name=self.collection_name,
-                container_name=self.input_files,
                 local_file_name=self.elbow_plot_file,
                 container_file_name=self.elbow_plot_file,
+                container_name=self.input_files_container,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.kn = KneeLocator(
@@ -162,9 +162,9 @@ class KMeans_Clustering:
             self.y_kmeans = self.kmeans.fit_predict(data)
 
             self.blob.save_model(
-                container_name=self.model_container,
                 model=self.kmeans,
                 model_dir=self.trained_model_dir,
+                container_name=self.model_container,
                 db_name=self.db_name,
                 collection_name=self.collection_name,
             )

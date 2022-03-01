@@ -306,12 +306,12 @@ class Preprocessor:
             )
 
             self.blob.upload_df_as_csv(
-                db_name=self.db_name,
-                collection_name=self.collection_name,
-                container_name=self.input_files_container,
                 dataframe=self.dataframe_with_null,
                 local_file_name=self.null_values_file,
                 container_file_name=self.null_values_file,
+                container_name=self.input_files_container,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.log_writer.start_log(
