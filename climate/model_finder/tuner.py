@@ -13,8 +13,8 @@ class Model_Finder:
     Revisions: None
     """
 
-    def __init__(self,db_name,collection_name):
-        self.db_name = db_name 
+    def __init__(self, db_name, collection_name):
+        self.db_name = db_name
 
         self.collection_name = collection_name
 
@@ -57,7 +57,9 @@ class Model_Finder:
 
         try:
             self.rf_model_name = self.model_utils.get_model_name(
-                model=self.rf_model, db_name=self.db_name,collection_name=self.collection_name
+                model=self.rf_model,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.rf_best_params = self.model_utils.get_model_params(
@@ -147,7 +149,9 @@ class Model_Finder:
 
         try:
             self.xgb_model_name = self.model_utils.get_model_name(
-                model=self.xgb_model, db_name=self.db_name,collection_name=self.collection_name
+                model=self.xgb_model,
+                db_name=self.db_name,
+                collection_name=self.collection_name,
             )
 
             self.xgb_best_params = self.model_utils.get_model_params(
