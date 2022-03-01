@@ -201,7 +201,7 @@ class MLFlow_Operations:
             self.log_writer.log(
                 db_name=self.db_name,
                 collection_name=self.collection_name,
-                log_info=f"Got mlflow client with tracking uri",
+                log_info="Got mlflow client with tracking uri",
             )
 
             self.log_writer.start_log(
@@ -623,7 +623,7 @@ class MLFlow_Operations:
             )
 
     def transition_mlflow_model(
-        self, model_version, stage, model_name, src_container, dest_container
+        self, model_version, stage, model_name, from_container_name, to_container_name
     ):
         """
         Method Name :   transition_mlflow_model
@@ -692,12 +692,12 @@ class MLFlow_Operations:
                 )
 
                 self.blob.copy_data(
+                    from_file_name=trained_model_file,
+                    from_container_name=from_container_name,
+                    to_file_name=prod_model_file,
+                    to_container_name=to_container_name,
                     db_name=self.db_name,
                     collection_name=self.collection_name,
-                    from_container_name=src_container,
-                    to_container_name=dest_container,
-                    from_file=trained_model_file,
-                    to_file=prod_model_file,
                 )
 
             elif stage == "Staging":
@@ -716,10 +716,10 @@ class MLFlow_Operations:
                 )
 
                 self.blob.copy_data(
-                    src_container=src_container,
-                    from_file=trained_model_file,
-                    dest_container=dest_container,
-                    to_file=stag_model_file,
+                    from_file_name=trained_model_file,
+                    from_container_name=from_container_name,
+                    to_file_name=stag_model_file,
+                    to_container_name=to_container_name,
                     db_name=self.db_name,
                     collection_name=self.collection_name,
                 )
