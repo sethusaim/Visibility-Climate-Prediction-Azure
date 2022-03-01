@@ -176,17 +176,17 @@ class Raw_Train_Data_Validation:
                 collection_name=self.train_gen_log,
             )
 
-    def validate_raw_local_file_name(
+    def validate_raw_file_name(
         self, regex, LengthOfDateStampInFile, LengthOfTimeStampInFile
     ):
         """
-        Method Name :   validate_raw_local_file_name
+        Method Name :   validate_raw_file_name
         Description :   This method is used for validating raw file name based on the regex pattern
 
         Version     :   1.2
         Revisions   :   moved setup to cloud
         """
-        method_name = self.validate_raw_local_file_name.__name__
+        method_name = self.validate_raw_file_name.__name__
 
         self.log_writer.start_log(
             key="start",

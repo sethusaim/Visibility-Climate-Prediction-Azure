@@ -64,7 +64,7 @@ class Train_Validation:
 
             regex = self.raw_data.get_regex_pattern()
 
-            self.raw_data.validate_raw_local_file_name(
+            self.raw_data.validate_raw_file_name(
                 regex, LengthOfDateStampInFile, LengthOfTimeStampInFile
             )
 
@@ -84,9 +84,7 @@ class Train_Validation:
                 log_info="Starting Data Transformation",
             )
 
-            self.data_transform.rename_target_column()
-
-            self.data_transform.replace_missing_with_null()
+            self.data_transform.add_quotes_to_string()
 
             self.log_writer.log(
                 db_name=self.db_name,
