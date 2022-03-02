@@ -49,6 +49,8 @@ async def create_containers():
 
         azure_container.generate_containers()
 
+        return Response("Created Azure containers !!")
+
     except Exception as e:
         return Response(f"Error Occurred! {e}")
 

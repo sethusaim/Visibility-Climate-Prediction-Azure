@@ -83,7 +83,7 @@ class Pred_Validation:
                 collection_name=self.pred_main_log,
                 log_message="Starting Data Transformation",
             )
-            
+
             self.data_transform.add_quotes_to_string()
 
             self.log_writer.log(
