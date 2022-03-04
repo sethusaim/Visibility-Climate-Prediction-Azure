@@ -45,8 +45,7 @@ The solution application is exposed as API using FastAPI and application is dock
 - XGBoost Classifier Model
 
 ### Metrics 
-- Accuracy
-- ROC AUC score
+- R2-score
 
 ### Cloud Deployment 
 - CI-CD deployment to Azure Container Instances
