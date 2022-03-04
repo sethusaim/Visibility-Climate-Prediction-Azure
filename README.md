@@ -1,4 +1,4 @@
-# Scania Truck Failure Prediction Azure System
+# Visibility Climate Prediction Azure System 
 
 This is an end to end machine learning system for predicting the visibility distance based on the given different climatic indicators in the training data. This entire solution is built using Azure Services like Azure Blob Storage (for storing the data), Azure CosmoDB MongoDB API (for logging and improvising the system performance and for database operations), Azure Container Registry (for storing the container images), and Azure  Container Instances (for running the container image). Apart from Azure services, MLFlow was used for experiment tracking and model versioning and model staging with artifacts stored in Azure Blob Storage. Docker for containerization of application. 
 
@@ -41,8 +41,8 @@ The solution application is exposed as API using FastAPI and application is dock
 - Azure Container Instances for running the container applications
 
 ### Algorithms Used 
-- Random Forest Classifier Model
-- XGBoost Classifier Model
+- Random Forest Regressor Model
+- XGBoost Regressor Model
 
 ### Metrics 
 - R2-score
